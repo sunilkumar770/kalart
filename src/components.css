@@ -308,3 +308,27 @@
 .chip { padding: 7px 16px; border-radius: var(--r-pill); border: 1px solid var(--ka-line-strong); background: var(--ka-surface); color: var(--ka-ink); font-size: 0.86rem; cursor: pointer; font-weight: 500; transition: all var(--t-fast); }
 .chip:hover { border-color: var(--ka-charcoal); }
 .chip.active { background: var(--ka-charcoal); color: #fff; border-color: var(--ka-charcoal); }
+
+/* Accessibility & Micro-Interactions --------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--ka-clay);
+  outline-offset: 3px;
+}
+.btn, .ka-navlink, .ka-iconbtn, .chip {
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+.btn:active, .ka-iconbtn:active {
+  transform: scale(0.97);
+}
+.ka-count {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

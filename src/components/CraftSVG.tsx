@@ -52,6 +52,8 @@ export function renderProductSVGString(
     pat = `<pattern id="${pid}" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect x="0" y="0" width="10" height="24" fill="${ink}" opacity=".45"/></pattern>`;
   } else if (cfg.pattern === "waves") {
     pat = `<pattern id="${pid}" width="44" height="20" patternUnits="userSpaceOnUse"><path d="M0 12 Q11 0 22 12 T44 12" fill="none" stroke="${ink}" stroke-width="4.5" opacity=".45" stroke-linecap="round"/></pattern>`;
+  } else if (cfg.pattern === "bandhani") {
+    pat = `<pattern id="${pid}" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="4.5" fill="${light}" opacity=".7"/><circle cx="15" cy="15" r="2.2" fill="${dark}"/><circle cx="15" cy="15" r="8" fill="none" stroke="${ink}" stroke-width="1.2" stroke-dasharray="2,2" opacity=".5"/></pattern>`;
   }
 
   const txt = cfg.text
