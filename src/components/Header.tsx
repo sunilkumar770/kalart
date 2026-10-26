@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Form, Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { api, CATEGORIES } from "../data/store";
 import { useApp } from "../context/AppContext";
 import { IconBag, IconHeart, IconMenu, IconClose, IconSearch, IconUser, IconChevronDown } from "./icons";
@@ -95,7 +95,7 @@ export default function Header() {
         </nav>
 
         <div className="ka-actions">
-          <Form role="search" action="/shop" method="get" className="ka-search" onSubmit={(e) => {
+          <form role="search" action="/shop" method="get" className="ka-search" onSubmit={(e) => {
             const q = (new FormData(e.currentTarget).get("q") as string | null)?.trim();
             e.preventDefault();
             nav(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
@@ -103,7 +103,7 @@ export default function Header() {
           }}>
             <IconSearch size={18} />
             <input type="search" name="q" placeholder="Search shawls, jutti, ikat…" aria-label="Search products" />
-          </Form>
+          </form>
 
           <Link to="/favorites" className="ka-iconbtn" aria-label={`Favourites (${favorites.length})`}>
             <IconHeart size={20} />
@@ -153,7 +153,7 @@ export default function Header() {
       {/* mobile search sits below when menu open */}
       {mobileOpen && (
         <div className="container ka-mobile-search">
-          <Form role="search" action="/shop" method="get" className="ka-search ka-search--full" onSubmit={(e) => {
+          <form role="search" action="/shop" method="get" className="ka-search ka-search--full" onSubmit={(e) => {
             const q = (new FormData(e.currentTarget).get("q") as string | null)?.trim();
             e.preventDefault();
             nav(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
@@ -161,7 +161,7 @@ export default function Header() {
           }}>
             <IconSearch size={18} />
             <input type="search" name="q" placeholder="Search handmade crafts…" aria-label="Search products" />
-          </Form>
+          </form>
         </div>
       )}
     </header>
