@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Field } from "../components/ui";
+import { ARTISANS } from "../data/store";
 import { useApp } from "../context/AppContext";
 import { IconArrowRight, IconCheck, IconChat, IconMail, IconPin, IconShield } from "../components/icons";
 
@@ -35,7 +36,7 @@ export function About() {
         <div className="container" style={{ paddingBlock: "var(--sp-6)" }}>
           <h2 style={{ fontSize: "1.3rem" }}>Numbers we publish yearly</h2>
           <div className="grid grid-p4">
-            {[["38", "partner workshops"], ["₹2.4 Cr", "paid to makers in 2026"], ["91%", "orders delivered on stated date"], ["4.8★", "median artisan rating"]].map(([n, l]) => (
+            {[[`${ARTISANS.length}`, "partner workshops"], ["₹2.4 Cr", "paid to makers in 2026"], ["91%", "orders delivered on stated date"], ["4.8★", "median artisan rating"]].map(([n, l]) => (
               <div key={l}><strong style={{ fontFamily: "var(--font-display)", fontSize: "1.9rem", color: "var(--ka-clay)" }} className="mono-num">{n}</strong><p className="text-small text-muted" style={{ margin: 0 }}>{l}</p></div>
             ))}
           </div>

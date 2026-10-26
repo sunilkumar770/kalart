@@ -124,12 +124,14 @@ export default function Checkout() {
           <h2 style={{ fontSize: "1.05rem", margin: 0 }}>Your order</h2>
           <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0, gap: 10 }}>
             {cart.map((l) => {
-              const p = PRODUCTS.find((x) => x.id === l.productId)!;
+              const p = PRODUCTS.find((x) => x.id === l.productId);
+              const pName = p ? p.name : "Handmade Piece";
+              const pImg = p && p.images && p.images[0] ? p.images[0] : "/img/hero-main.jpg";
               return (
                 <li key={l.productId + JSON.stringify(l.options)} className="row" style={{ gap: 10, alignItems: "flex-start" }}>
-                  <img src={p.images[0]} alt="" width={44} height={44} style={{ width: 44, height: 44, borderRadius: 6, objectFit: "cover", flex: "none" }} />
+                  <img src={pImg} alt="" width={44} height={44} style={{ width: 44, height: 44, borderRadius: 6, objectFit: "cover", flex: "none" }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: "0.88rem", fontWeight: 600, color: "var(--ka-charcoal)" }}>{p.name} × {l.qty}</span>
+                    <span style={{ display: "block", fontSize: "0.88rem", fontWeight: 600, color: "var(--ka-charcoal)" }}>{pName} × {l.qty}</span>
                     {Object.entries(l.options).map(([k, v]) => <span key={k} className="text-small text-muted" style={{ display: "block", fontSize: "0.76rem" }}>{k}: {v}</span>)}
                   </span>
                   <span className="mono-num text-small">{formatINR(l.unitPrice * l.qty)}</span>

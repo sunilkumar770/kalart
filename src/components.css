@@ -214,7 +214,7 @@
 .ka-choice input:focus-visible + span { outline: 2px solid var(--ka-focus); outline-offset: 2px; }
 
 .ka-stepper { display: inline-flex; align-items: center; border: 1px solid var(--ka-line-strong); border-radius: var(--r-md); overflow: hidden; }
-.ka-stepper button { width: 40px; height: 40px; border: 0; background: var(--ka-cream); color: var(--ka-charcoal); display: grid; place-items: center; }
+.ka-stepper button { width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: 0; background: var(--ka-cream); color: var(--ka-charcoal); display: grid; place-items: center; font-size: 1rem; cursor: pointer; }
 .ka-stepper button:hover { background: var(--ka-stone); }
 .ka-stepper output { min-width: 44px; text-align: center; font-weight: 650; font-variant-numeric: tabular-nums; }
 
@@ -273,7 +273,7 @@
 .cinfo { display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
 .cprice { font-weight: 600; font-size: 0.95rem; text-align: right; color: var(--ka-charcoal); }
 .qty-ctrl { display: flex; align-items: center; gap: 10px; }
-.qty-ctrl button { width: 28px; height: 28px; border: 1px solid var(--ka-line-strong); background: var(--ka-stone); border-radius: var(--r-sm); display: grid; place-items: center; font-weight: 600; }
+.qty-ctrl button { width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: 1px solid var(--ka-line-strong); background: var(--ka-stone); border-radius: var(--r-sm); display: grid; place-items: center; font-weight: 600; font-size: 1rem; cursor: pointer; }
 .qty-ctrl button:hover { background: var(--ka-cream); border-color: var(--ka-charcoal); }
 .drawer-foot { padding: 20px 24px; border-top: 1px solid var(--ka-line); background: var(--ka-ivory); }
 .summary > div { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }

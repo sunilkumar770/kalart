@@ -160,12 +160,19 @@ export function OrderDetail() {
             <h2 id="items-h" style={{ fontSize: "1.05rem", marginTop: 0 }}>Items</h2>
             <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0, gap: "var(--sp-4)" }}>
               {order.lines.map((l, i) => {
-                const p = PRODUCTS.find((x) => x.id === l.productId)!;
+                const p = PRODUCTS.find((x) => x.id === l.productId);
+                const pName = p ? p.name : "Handmade Piece";
+                const pImg = p?.images?.[0] || "/img/hero-main.jpg";
+                const pSlug = p ? p.slug : "";
                 return (
                   <li key={i} className="row" style={{ gap: 14, alignItems: "flex-start" }}>
-                    <img src={p.images[0]} alt="" width={72} height={72} style={{ width: 72, height: 72, borderRadius: "var(--r-md)", objectFit: "cover", border: "1px solid var(--ka-line)" }} />
+                    <img src={pImg} alt="" width={72} height={72} style={{ width: 72, height: 72, borderRadius: "var(--r-md)", objectFit: "cover", border: "1px solid var(--ka-line)" }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link to={`/product/${p.slug}`} style={{ fontWeight: 600, color: "var(--ka-charcoal)", textDecoration: "none" }}>{p.name} × {l.qty}</Link>
+                      {pSlug ? (
+                        <Link to={`/product/${pSlug}`} style={{ fontWeight: 600, color: "var(--ka-charcoal)", textDecoration: "none" }}>{pName} × {l.qty}</Link>
+                      ) : (
+                        <span style={{ fontWeight: 600, color: "var(--ka-charcoal)" }}>{pName} × {l.qty}</span>
+                      )}
                       {Object.entries(l.options).map(([k, v]) => <p key={k} className="text-small text-muted" style={{ margin: "2px 0 0" }}>{k}: {v}</p>)}
                     </div>
                     <strong className="mono-num" style={{ color: "var(--ka-charcoal)" }}>{formatINR(l.unitPrice * l.qty)}</strong>

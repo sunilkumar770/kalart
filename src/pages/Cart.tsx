@@ -49,13 +49,21 @@ export default function Cart() {
       <div className="ka-shop" style={{ gridTemplateColumns: "minmax(0,1fr) 340px" }}>
         <section className="stack" aria-label="Bag items">
           {cart.map((l, i) => {
-            const p = PRODUCTS.find((x) => x.id === l.productId)!;
+            const p = PRODUCTS.find((x) => x.id === l.productId);
+            const pName = p ? p.name : "Handmade Piece";
+            const pImg = p?.images?.[0] || "/img/hero-main.jpg";
+            const pSlug = p ? p.slug : "";
+            const pStock = p ? p.stock : 10;
             return (
               <article key={l.productId + JSON.stringify(l.options)} className="card card--pad row" style={{ gap: "var(--sp-4)", alignItems: "flex-start" }}>
-                <img src={p.images[0]} alt={p.name} width={96} height={96} loading="lazy"
+                <img src={pImg} alt={pName} width={96} height={96} loading="lazy"
                   style={{ width: 96, height: 96, borderRadius: "var(--r-md)", objectFit: "cover", border: "1px solid var(--ka-line)", flex: "none" }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link to={`/product/${p.slug}`} style={{ fontWeight: 650, color: "var(--ka-charcoal)", textDecoration: "none" }}>{p.name}</Link>
+                  {pSlug ? (
+                    <Link to={`/product/${pSlug}`} style={{ fontWeight: 650, color: "var(--ka-charcoal)", textDecoration: "none" }}>{pName}</Link>
+                  ) : (
+                    <span style={{ fontWeight: 650, color: "var(--ka-charcoal)" }}>{pName}</span>
+                  )}
                   {Object.keys(l.options).length > 0 && (
                     <ul className="text-small text-muted" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
                       {Object.entries(l.options).map(([k, v]) => <li key={k}>{k}: {v}</li>)}
@@ -64,14 +72,14 @@ export default function Cart() {
                   <p className="text-small text-muted" style={{ margin: "6px 0 0" }}>Unit price {formatINR(l.unitPrice)}</p>
                 </div>
                 <div className="row" style={{ gap: "var(--sp-4)", flexWrap: "wrap" }}>
-                  <div className="ka-stepper" role="group" aria-label={`Quantity for ${p.name}`}>
+                  <div className="ka-stepper" role="group" aria-label={`Quantity for ${pName}`}>
                     <button onClick={() => setQty(i, l.qty - 1)} aria-label="Decrease quantity"><IconMinus size={14} /></button>
                     <output aria-live="polite">{l.qty}</output>
-                    <button onClick={() => setQty(i, Math.min(p.stock, l.qty + 1))} disabled={l.qty >= p.stock} aria-label="Increase quantity"><IconPlus size={14} /></button>
+                    <button onClick={() => setQty(i, Math.min(pStock, l.qty + 1))} disabled={l.qty >= pStock} aria-label="Increase quantity"><IconPlus size={14} /></button>
                   </div>
                   <strong className="mono-num" style={{ minWidth: 84, textAlign: "right", color: "var(--ka-charcoal)" }}>{formatINR(l.unitPrice * l.qty)}</strong>
-                  <button className="btn btn--ghost btn--sm" aria-label={`Remove ${p.name} from bag`}
-                    onClick={() => { setQty(i, 0); toast("info", `${p.name} removed.`); }}>
+                  <button className="btn btn--ghost btn--sm" aria-label={`Remove ${pName} from bag`}
+                    onClick={() => { setQty(i, 0); toast("info", `${pName} removed.`); }}>
                     <IconTrash size={15} />
                   </button>
                 </div>

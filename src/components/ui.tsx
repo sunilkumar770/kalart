@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Artisan, Product } from "../data/store";
 import { formatINR } from "../data/store";
@@ -107,21 +107,21 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 }
 
 // ---------------------------------------------------------------- Favorite button
-export function FavoriteButton({ productId, floating = false }: { productId: string; floating?: boolean }) {
+export function FavoriteButton({ productId, floating = false, productName }: { productId: string; floating?: boolean; productName?: string }) {
   const { favorites, toggleFavorite, toast } = useApp();
   const active = favorites.includes(productId);
   return (
     <button
       className="btn btn--sm"
       aria-pressed={active}
-      aria-label={active ? "Remove from favourites" : "Save to favourites"}
+      aria-label={active ? (productName ? `Remove ${productName} from favourites` : "Remove from favourites") : (productName ? `Save ${productName} to favourites` : "Save to favourites")}
       onClick={(e) => {
         e.preventDefault(); e.stopPropagation();
         toggleFavorite(productId);
         toast("success", active ? "Removed from favourites" : "Saved to favourites");
       }}
       style={floating ? {
-        position: "absolute", top: 10, right: 10, width: 38, height: 38, padding: 0,
+        position: "absolute", top: 10, right: 10, width: 44, height: 44, minWidth: 44, minHeight: 44, padding: 0,
         borderRadius: "50%", background: "rgba(255,255,255,0.92)", border: "1px solid var(--ka-line)",
         color: active ? "var(--ka-clay)" : "var(--ka-muted)", boxShadow: "var(--sh-sm)",
       } : { borderColor: active ? "var(--ka-clay)" : "var(--ka-line-strong)", color: active ? "var(--ka-clay)" : undefined }}
@@ -142,7 +142,7 @@ export function ProductCard({ product }: { product: Product }) {
             style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform var(--t-med)" }} />
         </div>
       </Link>
-      <FavoriteButton productId={product.id} floating />
+      <FavoriteButton productId={product.id} productName={product.name} floating />
       {product.tags.includes("bestseller") && (
         <span className="badge badge--clay" style={{ position: "absolute", top: 10, left: 10 }}>Bestseller</span>
       )}
@@ -261,7 +261,10 @@ export function Field({ label, htmlFor, hint, error, required, children }: {
         {required && <span className="sr-only"> (required)</span>}
       </label>
       {hint && <span className="hint" id={htmlFor + "-hint"}>{hint}</span>}
-      {children}
+      {React.isValidElement(children) ? React.cloneElement(children as React.ReactElement<any>, {
+        "aria-describedby": (children.props as any)["aria-describedby"] || [hint ? htmlFor + "-hint" : null, error ? htmlFor + "-error" : null].filter(Boolean).join(" ") || undefined,
+        "aria-invalid": (children.props as any)["aria-invalid"] ?? (error ? true : undefined),
+      }) : children}
       {error && <span className="field-error" id={htmlFor + "-error"} role="alert"><IconAlert size={14} />{error}</span>}
     </div>
   );

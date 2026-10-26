@@ -51,7 +51,7 @@ export default function Footer() {
         </div>
         <div className="ka-footer__bottom">
           <span>© 2026 KALART · Bengaluru, India · Handcrafted heritage directly from master artisans</span>
-          <span>Made with hand-set type and honest light.</span>
+          <span>Prototype development build · Direct artisan commerce</span>
         </div>
       </div>
     </footer>

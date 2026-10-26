@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { api, CATEGORIES, categoryName, PRODUCTS, type Product } from "../data/store";
 import { CategoryTile, EmptyState, GridSkeleton, ProductCard } from "../components/ui";
 import { IconArrowRight } from "../components/icons";
@@ -21,7 +21,7 @@ export function CraftsIndex() {
 }
 
 export function CraftDetail() {
-  const slug = window.location.pathname.split("/")[2] ?? "";
+  const { slug } = useParams();
   const cat = CATEGORIES.find((c) => c.slug === slug);
   const [items, setItems] = useState<Product[] | null>(null);
   useEffect(() => { let l = true; api.listProducts({ category: slug }).then((p) => l && setItems(p)); return () => { l = false; }; }, [slug]);
@@ -41,7 +41,7 @@ export function CraftDetail() {
           <p className="eyebrow">{makers.length} partner workshop{makers.length === 1 ? "" : "s"}</p>
           <h1 style={{ marginTop: 0 }}>{cat.name}</h1>
           <p className="lede">{cat.blurb} Every piece lists its maker, materials and honest lead time before you order.</p>
-          <Link to="/shop?category=" className="btn btn--outline" onClick={(e) => { e.preventDefault(); window.location.href = `/shop?category=${cat.slug}`; }}>
+          <Link to={`/shop?category=${cat.slug}`} className="btn btn--outline">
             Filter shop to {cat.name.toLowerCase()} <IconArrowRight size={15} />
           </Link>
         </div>
