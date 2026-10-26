@@ -64,9 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const clearCart = useCallback(() => {
-    try {
-      localStorage.removeItem("kalart_cart");
-    } catch {}
+    api.clearCart();
     refreshCart();
   }, [refreshCart]);
 
