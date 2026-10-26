@@ -1,276 +1,244 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useApp } from "../context/AppContext";
 import {
-  SHOWCASE_PRODUCTS,
-  SHOWCASE_ARTISANS,
-  INITIAL_DESIGN_QUEUE,
-  DesignRequest,
-  calcShowcasePrice,
-  cfgSummary,
-} from "../data/showcaseData";
-import { ProductSVG, AvatarSVG } from "../components/CraftSVG";
+  api,
+  ARTISANS,
+  PRODUCTS,
+  formatINR,
+  type DesignRequest,
+  type Order,
+} from "../data/store";
+import { useApp } from "../context/AppContext";
+import { StatusBadge } from "../components/ui";
+import {
+  IconBox,
+  IconChart,
+  IconRupee,
+  IconSparkle,
+  IconShield,
+  IconCheck,
+  IconClose,
+} from "../components/icons";
 
 export default function ArtisanDashboard() {
-  const { toast } = useApp();
-  const artisan = SHOWCASE_ARTISANS[0]; // Meera Kapoor
+  const { user, toast } = useApp();
+  const artisan = ARTISANS.find((a) => a.id === user?.artisanId) ?? ARTISANS[0];
 
-  const [queue, setQueue] = useState<DesignRequest[]>(() => {
-    try {
-      const stored = localStorage.getItem("kalart_custom_designs");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      }
-    } catch {}
-    return INITIAL_DESIGN_QUEUE;
-  });
+  const [requests, setRequests] = useState<DesignRequest[] | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  const [listingsStatus, setListingsStatus] = useState<Record<string, boolean>>({
-    p1: true,
-    p6: true,
-  });
-
-  const [activeOrders, setActiveOrders] = useState([
-    { id: "KA-2412", item: "Terra Organic Vase · Terracotta · Waves", patron: "Arthur Pendelton", payout: "$76.00", status: "In production" },
-    { id: "KA-2398", item: "Hearth Candle Set · Cream · Dots · 'HOME'", patron: "Elena Rostova", payout: "$55.00", status: "Glaze Firing" },
-    { id: "KA-2385", item: "Terra Organic Vase · Sand · Large", patron: "Kenji Sato", payout: "$96.00", status: "Quality Check" },
-  ]);
-
-  const pendingDesigns = queue.filter((d) => !d.approved && !d.rejected);
-
-  const handleDecision = (id: string, approved: boolean) => {
-    const item = queue.find((d) => d.id === id);
-    if (!item) return;
-
-    const p = SHOWCASE_PRODUCTS.find((x) => x.id === item.pid) || SHOWCASE_PRODUCTS[0];
-
-    const updated = queue.map((d) =>
-      d.id === id ? { ...d, approved, rejected: !approved } : d
+  const load = () => {
+    api.listRequests(artisan.id).then(setRequests);
+    api.listOrders().then((os) =>
+      setOrders(
+        os.filter((o) =>
+          o.lines.some((l) => PRODUCTS.find((p) => p.id === l.productId)?.artisanId === artisan.id)
+        )
+      )
     );
-    setQueue(updated);
-    try {
-      localStorage.setItem("kalart_custom_designs", JSON.stringify(updated));
-    } catch {}
-
-    if (approved) {
-      const newOrder = {
-        id: "KA-" + Math.floor(2300 + Math.random() * 600),
-        item: `${p.name} · ${cfgSummary(p, item.cfg)}`,
-        patron: item.customer,
-        payout: `$${calcShowcasePrice(p, item.cfg).toFixed(2)}`,
-        status: "In production",
-      };
-      setActiveOrders((prev) => [newOrder, ...prev]);
-      toast("success", `Approved custom design for ${item.customer} — moved to workshop queue`);
-    } else {
-      toast("info", `Declined design request — customer notified and fully refunded`);
-    }
   };
 
-  const toggleListing = (pid: string) => {
-    setListingsStatus((prev) => {
-      const next = !prev[pid];
-      toast(next ? "success" : "info", next ? "Listing is now live on KALART" : "Listing paused");
-      return { ...prev, [pid]: next };
-    });
+  useEffect(load, [artisan.id]);
+
+  const act = async (id: string, patch: Partial<DesignRequest>, msg: string) => {
+    await api.updateRequest(id, patch);
+    setRequests((rs) => (rs ? rs.map((r) => (r.id === id ? { ...r, ...patch } : r)) : rs));
+    toast("success", msg);
   };
 
-  const myProducts = SHOWCASE_PRODUCTS.filter((p) => p.artisanId === artisan.id);
+  const newCount = requests?.filter((r) => r.status === "new").length ?? 0;
+  const myProducts = useMemo(
+    () => PRODUCTS.filter((p) => p.artisanId === artisan.id),
+    [artisan.id]
+  );
 
   return (
-    <main id="main" className="artisan-dash" style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 24px 70px" }}>
-      {/* HEADER BANNER */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 68, height: 68, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--terra)" }}>
-            <AvatarSVG avatar={artisan.av} />
-          </div>
+    <main id="main" className="container section--tight">
+      <div
+        className="row row--between row--wrap"
+        style={{ gap: "var(--sp-3)", marginBlock: "var(--sp-4)" }}
+      >
+        <div className="row" style={{ gap: 14 }}>
+          <img
+            src={artisan.image}
+            alt=""
+            width={60}
+            height={60}
+            style={{ width: 60, height: 60, borderRadius: "50%", objectFit: "cover" }}
+          />
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <h1 style={{ fontSize: "clamp(24px, 3.2vw, 32px)", margin: 0 }}>{artisan.name}'s Studio</h1>
-              <span className="vpill" style={{ fontSize: 11 }}>✓ Verified Master Potter</span>
-            </div>
-            <p style={{ color: "var(--ink-soft)", margin: "4px 0 0", fontSize: 13.5 }}>
-              {artisan.craft} Studio · {artisan.loc} · 0% Platform Commission Account
+            <p className="eyebrow" style={{ marginBottom: 2 }}>
+              Artisan Workspace
+            </p>
+            <h1 style={{ margin: 0, fontSize: "1.45rem" }}>{artisan.name}'s Studio</h1>
+            <p className="text-muted text-small" style={{ margin: "4px 0 0" }}>
+              {artisan.craft} · {artisan.location}
+              {artisan.verified ? " · Verified partner" : " · Verification pending"}
             </p>
           </div>
         </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link to="/customize" className="btn btn-ghost btn-sm">
-            ✨ Open Customizer
-          </Link>
-          <Link to="/" className="btn btn-primary btn-sm">
-            Browse Storefront
-          </Link>
-        </div>
+        <Link to="/sell" className="btn btn--outline btn--sm">
+          Workshop profile &amp; policies
+        </Link>
       </div>
 
-      {/* KPI METRIC CARDS */}
-      <div className="dgrid">
-        <div className="stat-card">
-          <small>Custom Designs Awaiting Approval</small>
-          <b style={{ color: "var(--terra)" }}>{pendingDesigns.length}</b>
-          <div className="trend">Requires review within 24h</div>
+      {/* KPI METRICS */}
+      <section className="ka-kpis" aria-label="Key metrics" style={{ marginBottom: "var(--sp-5)" }}>
+        <div className="card ka-kpi">
+          <div className="row" style={{ gap: 8, color: "var(--ka-clay)", marginBottom: 4 }}>
+            <IconSparkle size={18} />
+            <span className="lbl">New Briefs</span>
+          </div>
+          <div className="num">{newCount}</div>
         </div>
-        <div className="stat-card">
-          <small>Total Master Sales</small>
-          <b>{artisan.sales} pcs</b>
-          <div className="trend">Across 18 patron countries</div>
+        <div className="card ka-kpi">
+          <div className="row" style={{ gap: 8, color: "var(--ka-indigo)", marginBottom: 4 }}>
+            <IconBox size={18} />
+            <span className="lbl">In Production</span>
+          </div>
+          <div className="num">
+            {orders.filter((o) => ["placed", "customization_review", "in_production"].includes(o.status)).length}
+          </div>
         </div>
-        <div className="stat-card">
-          <small>Artisan Share / Commission</small>
-          <b style={{ color: "var(--sage)" }}>100% / 0%</b>
-          <div className="trend">You keep every dollar</div>
+        <div className="card ka-kpi">
+          <div className="row" style={{ gap: 8, color: "var(--ka-success)", marginBottom: 4 }}>
+            <IconRupee size={18} />
+            <span className="lbl">Fair Trade Share</span>
+          </div>
+          <div className="num">0% cut</div>
         </div>
-        <div className="stat-card">
-          <small>Patron Satisfaction Rating</small>
-          <b>★ {artisan.rating}</b>
-          <div className="trend">128 verified reviews</div>
+        <div className="card ka-kpi">
+          <div className="row" style={{ gap: 8, color: "var(--ka-gold)", marginBottom: 4 }}>
+            <IconChart size={18} />
+            <span className="lbl">Rating</span>
+          </div>
+          <div className="num">{artisan.rating} ★</div>
         </div>
-      </div>
+      </section>
 
-      {/* SECTION 1: CUSTOM DESIGNS QUEUE */}
-      <section style={{ marginTop: 36 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <h2 style={{ fontSize: 22, margin: 0 }}>
-            Incoming Bespoke Requests ({pendingDesigns.length})
-          </h2>
-          <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
-            Patrons pay upfront into direct escrow · Work begins upon your approval
-          </span>
-        </div>
-
-        <div className="design-queue">
-          {pendingDesigns.length === 0 ? (
-            <div className="empty-state" style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: "var(--radius)", border: "1px dashed var(--line)" }}>
-              <p style={{ fontSize: 28, margin: 0 }}>✓</p>
-              <h3 style={{ fontFamily: "Fraunces, serif", fontSize: 18, marginTop: 8 }}>
-                All custom briefs approved!
-              </h3>
-              <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: "4px 0 0" }}>
-                New orders placed via the AI Customizer will appear here in real time.
-              </p>
-            </div>
-          ) : (
-            pendingDesigns.map((d) => {
-              const p = SHOWCASE_PRODUCTS.find((x) => x.id === d.pid) || SHOWCASE_PRODUCTS[0];
-              const price = calcShowcasePrice(p, d.cfg);
-
-              return (
-                <div key={d.id} className="design-card">
-                  <div className="dc-prev">
-                    <ProductSVG
-                      type={p.svg}
-                      cfg={{
-                        color: p.colors[d.cfg.colorIdx]?.h || "#C05F3C",
-                        pattern: d.cfg.pattern,
-                        text: d.cfg.text,
-                      }}
-                    />
+      {/* SECTION 1: INCOMING CUSTOM BRIEFS */}
+      <section style={{ marginBottom: "var(--sp-6)" }}>
+        <h2 style={{ fontSize: "1.18rem", marginBottom: "var(--sp-4)" }}>
+          Incoming Custom Requests ({requests?.length || 0})
+        </h2>
+        {!requests || requests.length === 0 ? (
+          <div className="card card--pad text-center" style={{ color: "var(--ka-muted)" }}>
+            <p style={{ margin: 0 }}>No pending design briefs for your workshop.</p>
+          </div>
+        ) : (
+          <div className="stack" style={{ gap: "var(--sp-4)" }}>
+            {requests.map((r) => (
+              <div key={r.id} className="card card--pad">
+                <div
+                  className="row row--between row--wrap"
+                  style={{ gap: 8, marginBottom: 8 }}
+                >
+                  <div>
+                    <strong style={{ fontSize: "1.05rem" }}>{r.product}</strong>
+                    <span className="text-small text-muted" style={{ display: "block" }}>
+                      Patron: <strong>{r.customer}</strong> · Order Ref: {r.orderRef} · Received {r.receivedAt}
+                    </span>
                   </div>
-
-                  <div className="dc-info">
-                    <b>{p.name}</b>
-                    <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: "2px 0 4px" }}>
-                      Configuration: <b>{cfgSummary(p, d.cfg)}</b>
-                    </p>
-                    <p style={{ color: "var(--terra)", fontSize: 13, margin: "2px 0" }}>
-                      Patron: <b>{d.customer}</b> · Submitted {d.date} · “{d.note}”
-                    </p>
-                    <p style={{ fontSize: 13, margin: "4px 0 0" }}>
-                      Payout to you: <b>${price.toFixed(2)}</b> (0% platform commission)
-                    </p>
-                  </div>
-
-                  <div className="dc-actions">
-                    <button
-                      className="btn-ok"
-                      onClick={() => handleDecision(d.id, true)}
-                    >
-                      ✓ Approve &amp; start
-                    </button>
-                    <button
-                      className="btn-no"
-                      onClick={() => handleDecision(d.id, false)}
-                    >
-                      Decline
-                    </button>
-                  </div>
+                  <StatusBadge status={r.status} />
                 </div>
-              );
-            })
-          )}
-        </div>
+
+                <div
+                  className="card card--pad"
+                  style={{ background: "var(--ka-ivory)", margin: "8px 0 12px" }}
+                >
+                  <strong style={{ fontSize: "0.85rem", display: "block", marginBottom: 2 }}>
+                    Requested options:
+                  </strong>
+                  <p className="text-small" style={{ margin: 0 }}>
+                    {r.summary}
+                  </p>
+                </div>
+
+                {r.status === "new" && (
+                  <div className="row" style={{ gap: 8, marginTop: 12 }}>
+                    <button
+                      type="button"
+                      className="btn btn--primary btn--sm"
+                      onClick={() =>
+                        act(r.id, { status: "feasibility_ok" }, "Design approved for production")
+                      }
+                    >
+                      <IconCheck size={14} /> Approve &amp; begin
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn--outline btn--sm"
+                      onClick={() =>
+                        act(r.id, { status: "revision_requested" }, "Requested revision from patron")
+                      }
+                    >
+                      Request tweak
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm"
+                      onClick={() =>
+                        act(r.id, { status: "declined" }, "Declined custom request")
+                      }
+                    >
+                      <IconClose size={14} /> Decline
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* SECTION 2: WORKSHOP CATALOG LISTINGS */}
-      <section style={{ marginTop: 44 }}>
-        <h2 style={{ fontSize: 22, marginBottom: 14 }}>My Active Workshop Listings</h2>
-        <div style={{ background: "#fff", borderRadius: "var(--radius)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
-          <table className="ptable" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+      {/* SECTION 2: WORKSHOP CATALOG */}
+      <section style={{ marginBottom: "var(--sp-6)" }}>
+        <h2 style={{ fontSize: "1.18rem", marginBottom: "var(--sp-4)" }}>
+          Active Workshop Listings ({myProducts.length})
+        </h2>
+        <div className="table-wrap">
+          <table className="table">
             <thead>
-              <tr style={{ background: "rgba(250,245,238,0.7)", borderBottom: "1px solid var(--line)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-soft)" }}>
-                <th style={{ padding: "12px 18px" }}>Craft Piece</th>
-                <th style={{ padding: "12px 18px" }}>Discipline</th>
-                <th style={{ padding: "12px 18px" }}>Base Price</th>
-                <th style={{ padding: "12px 18px" }}>Lead Time</th>
-                <th style={{ padding: "12px 18px" }}>Listing State</th>
+              <tr>
+                <th>Piece</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Lead time</th>
+                <th>Customisable</th>
               </tr>
             </thead>
             <tbody>
-              {myProducts.map((p) => {
-                const isLive = listingsStatus[p.id] !== false;
-                return (
-                  <tr key={p.id} style={{ borderBottom: "1px solid var(--line)", fontSize: 13.5 }}>
-                    <td style={{ padding: "12px 18px", display: "flex", alignItems: "center", gap: 12 }}>
-                      <div style={{ width: 44, height: 44, background: "#F4E9D8", borderRadius: 10, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <ProductSVG type={p.svg} cfg={{ color: p.colors[0]?.h || "#C05F3C", pattern: "none", text: "" }} />
-                      </div>
-                      <b>{p.name}</b>
-                    </td>
-                    <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{p.cat}</td>
-                    <td style={{ padding: "12px 18px", fontWeight: 600 }}>from ${p.base}</td>
-                    <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{p.lead}</td>
-                    <td style={{ padding: "12px 18px" }}>
-                      <button
-                        className={`toggle ${isLive ? "on" : ""}`}
-                        onClick={() => toggleListing(p.id)}
-                        aria-label="Toggle listing status"
+              {myProducts.map((p) => (
+                <tr key={p.id}>
+                  <td>
+                    <Link
+                      to={`/product/${p.slug}`}
+                      className="row"
+                      style={{ gap: 10, textDecoration: "none", color: "inherit" }}
+                    >
+                      <img
+                        src={p.images[0]}
+                        alt=""
+                        width={40}
+                        height={40}
+                        style={{ width: 40, height: 40, borderRadius: 6, objectFit: "cover" }}
                       />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* SECTION 3: WORKSHOP PRODUCTION ORDERS */}
-      <section style={{ marginTop: 44 }}>
-        <h2 style={{ fontSize: 22, marginBottom: 14 }}>Active Production Orders</h2>
-        <div style={{ background: "#fff", borderRadius: "var(--radius)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
-          <table className="ptable" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-            <thead>
-              <tr style={{ background: "rgba(250,245,238,0.7)", borderBottom: "1px solid var(--line)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-soft)" }}>
-                <th style={{ padding: "12px 18px" }}>Order ID</th>
-                <th style={{ padding: "12px 18px" }}>Item &amp; Specifications</th>
-                <th style={{ padding: "12px 18px" }}>Patron</th>
-                <th style={{ padding: "12px 18px" }}>Artisan Payout</th>
-                <th style={{ padding: "12px 18px" }}>Production Phase</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeOrders.map((o) => (
-                <tr key={o.id} style={{ borderBottom: "1px solid var(--line)", fontSize: 13.5 }}>
-                  <td style={{ padding: "12px 18px", fontFamily: "monospace", fontWeight: 600 }}>{o.id}</td>
-                  <td style={{ padding: "12px 18px" }}><b>{o.item}</b></td>
-                  <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{o.patron}</td>
-                  <td style={{ padding: "12px 18px", fontWeight: 700, color: "var(--terra)" }}>{o.payout}</td>
-                  <td style={{ padding: "12px 18px" }}>
-                    <span className="status st-wait">{o.status}</span>
+                      <strong>{p.name}</strong>
+                    </Link>
+                  </td>
+                  <td>{p.categorySlug}</td>
+                  <td>
+                    <strong>{formatINR(p.price)}</strong>
+                  </td>
+                  <td>
+                    {p.leadTimeDays[0]}–{p.leadTimeDays[1]} days
+                  </td>
+                  <td>
+                    {p.customizable ? (
+                      <span className="badge badge--indigo">Customisable</span>
+                    ) : (
+                      <span className="badge badge--neutral">Standard</span>
+                    )}
                   </td>
                 </tr>
               ))}

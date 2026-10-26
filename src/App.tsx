@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import CartDrawer from "./components/CartDrawer";
-import CheckoutModal from "./components/CheckoutModal";
+import RequireRole from "./components/RequireRole";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -90,8 +90,22 @@ export default function App() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/account/orders" element={<OrdersPage />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
-          <Route path="/artisan" element={<ArtisanDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route
+            path="/artisan"
+            element={
+              <RequireRole role="artisan">
+                <ArtisanDashboard />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireRole role="admin">
+                <AdminDashboard />
+              </RequireRole>
+            }
+          />
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />
           <Route path="/sell" element={<Sell />} />
@@ -101,7 +115,6 @@ export default function App() {
       </div>
       <Footer />
       <CartDrawer />
-      <CheckoutModal />
     </div>
   );
 }

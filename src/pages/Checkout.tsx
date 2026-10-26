@@ -71,7 +71,7 @@ export default function Checkout() {
         <Link to="/">Home</Link> / <Link to="/cart">Bag</Link> / <span aria-current="page">Checkout</span>
       </nav>
       <h1 style={{ marginBottom: "var(--sp-5)" }}>Checkout</h1>
-      <form onSubmit={place} className="ka-shop" style={{ gridTemplateColumns: "minmax(0,1fr) 360px" }} noValidate>
+      <form onSubmit={place} className="ka-checkout-grid" noValidate>
         <div className="stack" style={{ gap: "var(--sp-5)" }}>
           {!user && (
             <section className="card card--pad stack" aria-labelledby="contact-h">

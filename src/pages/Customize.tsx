@@ -1,62 +1,112 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import {
-  SHOWCASE_PRODUCTS,
-  getArtisanById,
-  calcShowcasePrice,
-  cfgSummary,
-  ShowcaseProduct,
-  DesignRequestConfig,
-} from "../data/showcaseData";
-import { ProductSVG, AvatarSVG, SealSVG } from "../components/CraftSVG";
+  PRODUCTS,
+  ARTISANS,
+  formatINR,
+  type Product,
+} from "../data/store";
+import {
+  IconCheck,
+  IconShield,
+  IconSparkle,
+  IconTruck,
+  IconArrowRight,
+} from "../components/icons";
+import { ProductSVG } from "../components/CraftSVG";
 
 const GEN_STEPS = [
-  ["Analyzing artisan style…", "Studying Jaipur terracotta heritage"],
-  ["Composing your design…", "Balancing pigment, motif & organic form"],
-  ["Rendering photoreal mockup…", "Simulating natural glaze kiln firing"],
-  ["Mockup ready ✓", "Harmonized bespoke edition created"],
+  ["Consulting workshop specifications…", "Reviewing cluster craft traditions"],
+  ["Composing bespoke variation…", "Harmonising motif, natural dye & scale"],
+  ["Simulating weave & glaze texture…", "Preparing visual feasibility preview"],
+  ["Preview ready", "Bespoke preview generated for artisan review"],
 ];
 
 export default function Customize() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { addToCart, setCartOpen, setCheckoutOpen, toast } = useApp();
+  const { addToCart, setCartOpen, toast } = useApp();
 
-  const productIdParam = params.get("product") || params.get("id") || "p1";
-  const [product, setProduct] = useState<ShowcaseProduct>(() => {
-    return (
-      SHOWCASE_PRODUCTS.find((p) => p.id === productIdParam || p.svg === productIdParam) ||
-      SHOWCASE_PRODUCTS[0]
-    );
+  const customisables = useMemo(
+    () => PRODUCTS.filter((p) => p.customizable && p.customization && p.customization.length > 0),
+    []
+  );
+
+  const productParam = params.get("product") || params.get("id");
+
+  const [product, setProduct] = useState<Product>(() => {
+    if (productParam) {
+      const match = PRODUCTS.find((p) => p.slug === productParam || p.id === productParam);
+      if (match) return match;
+    }
+    return customisables[0] || PRODUCTS[0];
   });
 
-  const [cfg, setCfg] = useState<DesignRequestConfig>({
-    colorIdx: 0,
-    pattern: "none",
-    sizeIdx: 0,
-    text: "",
-  });
-
+  // Selected options state
+  const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
+  const [textInputs, setTextInputs] = useState<Record<string, string>>({});
+  const [previewMode, setPreviewMode] = useState<"photo" | "vector">("photo");
   const [isGenerating, setIsGenerating] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const genInterval = useRef<number | undefined>(undefined);
 
-  // Sync if URL param changes
+  // Sync when param changes
   useEffect(() => {
-    const target = SHOWCASE_PRODUCTS.find(
-      (p) => p.id === productIdParam || p.svg === productIdParam
-    );
-    if (target) {
-      setProduct(target);
-      setCfg({ colorIdx: 0, pattern: "none", sizeIdx: 0, text: "" });
+    if (productParam) {
+      const target = PRODUCTS.find((p) => p.slug === productParam || p.id === productParam);
+      if (target) {
+        setProduct(target);
+        // initialize default choices
+        const defaults: Record<string, string> = {};
+        target.customization?.forEach((opt) => {
+          if (opt.choices && opt.choices.length > 0) {
+            defaults[opt.label] = opt.choices[0];
+          }
+        });
+        setSelectedChoices(defaults);
+        setTextInputs({});
+      }
     }
-  }, [productIdParam]);
+  }, [productParam]);
 
-  const artisan = getArtisanById(product.artisanId);
-  const currentPrice = calcShowcasePrice(product, cfg);
+  // Initialize options for initial product
+  useEffect(() => {
+    const defaults: Record<string, string> = {};
+    product.customization?.forEach((opt) => {
+      if (opt.choices && opt.choices.length > 0) {
+        defaults[opt.label] = opt.choices[0];
+      }
+    });
+    setSelectedChoices(defaults);
+    setTextInputs({});
+  }, [product]);
 
-  const handleGenerateMockup = () => {
+  const artisan = useMemo(
+    () => ARTISANS.find((a) => a.id === product.artisanId),
+    [product.artisanId]
+  );
+
+  // Calculate dynamic price in INR
+  const totalPrice = useMemo(() => {
+    let sum = product.price;
+    if (!product.customization) return sum;
+
+    product.customization.forEach((opt) => {
+      if (opt.choices && opt.priceDelta) {
+        const choice = selectedChoices[opt.label];
+        if (choice && choice !== opt.choices[0]) {
+          sum += opt.priceDelta;
+        }
+      }
+      if (opt.freeText && opt.priceDelta && textInputs[opt.label]?.trim()) {
+        sum += opt.priceDelta;
+      }
+    });
+    return sum;
+  }, [product, selectedChoices, textInputs]);
+
+  const handleGenerate = () => {
     if (isGenerating) return;
     setIsGenerating(true);
     setStepIndex(0);
@@ -69,21 +119,8 @@ export default function Customize() {
       } else {
         clearInterval(genInterval.current);
         setIsGenerating(false);
-
-        // AI suggestion: Pick a complementary color and pattern
-        const randomColor = (cfg.colorIdx + 1) % product.colors.length;
-        const availablePatterns = product.patterns.filter((p) => p !== "none");
-        const randomPattern =
-          availablePatterns.length > 0
-            ? availablePatterns[Math.floor(Math.random() * availablePatterns.length)]
-            : "none";
-
-        setCfg((prev) => ({
-          ...prev,
-          colorIdx: randomColor,
-          pattern: randomPattern,
-        }));
-        toast("success", "AI generated a harmonized design mockup ✨");
+        setPreviewMode("vector");
+        toast("success", "Visual feasibility preview generated");
       }
     }, 600);
   };
@@ -92,243 +129,302 @@ export default function Customize() {
     return () => clearInterval(genInterval.current);
   }, []);
 
-  const handleAddToBasket = (proceedToCheckout: boolean) => {
+  const handleAddToCart = (proceedToCheckout: boolean) => {
+    const combinedOptions: Record<string, string> = { ...selectedChoices };
+    Object.entries(textInputs).forEach(([k, v]) => {
+      if (v.trim()) combinedOptions[k] = v.trim();
+    });
+
     addToCart({
       productId: product.id,
       qty: 1,
-      options: {
-        Color: product.colors[cfg.colorIdx]?.n || "Default",
-        Pattern: cfg.pattern !== "none" ? cfg.pattern : "Plain",
-        Size: product.sizes[cfg.sizeIdx]?.l || "Standard",
-        Engraving: cfg.text.trim(),
-      },
-      unitPrice: currentPrice,
+      options: combinedOptions,
+      unitPrice: totalPrice,
     });
 
     if (proceedToCheckout) {
-      setCheckoutOpen(true);
+      navigate("/checkout");
     } else {
       setCartOpen(true);
-      toast("success", `Added bespoke ${product.name} to your basket`);
+      toast("success", `Added custom ${product.name} to your bag`);
     }
   };
 
   return (
-    <main id="main" className="kalart-customizer" style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px 60px" }}>
-      {/* CRAFT PICKER CHIPS */}
-      <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
-          Craft Base:
-        </span>
-        {SHOWCASE_PRODUCTS.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => {
-              setProduct(p);
-              setCfg({ colorIdx: 0, pattern: "none", sizeIdx: 0, text: "" });
-            }}
-            className={`chip ${product.id === p.id ? "active" : ""}`}
-            style={{ fontSize: 13 }}
-          >
-            {p.name}
-          </button>
-        ))}
+    <main id="main" className="container section--tight">
+      {/* BREADCRUMB */}
+      <nav className="ka-crumbs" aria-label="Breadcrumb">
+        <Link to="/">Home</Link> / <Link to="/shop">Shop</Link> /{" "}
+        <span aria-current="page">Customisation studio</span>
+      </nav>
+
+      {/* PIECE PICKER */}
+      <div style={{ marginBottom: "var(--sp-5)" }}>
+        <p className="eyebrow" style={{ marginBottom: 6 }}>
+          Select Base Craft
+        </p>
+        <div className="chips">
+          {customisables.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className={`chip ${product.id === p.id ? "active" : ""}`}
+              onClick={() => {
+                navigate(`/customize?product=${p.slug}`);
+              }}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="detail">
-        {/* ================= LEFT: LIVE INTERACTIVE STAGE ================= */}
+        {/* ================= LEFT: PREVIEW STAGE ================= */}
         <div className="gallery">
-          <div className={`stage ${isGenerating ? "gen" : ""}`} style={{ position: "relative" }}>
-            <span className="vbadge">✓ Verified artisan design</span>
+          <div className={`stage ${isGenerating ? "gen" : ""}`}>
+            <span
+              className="badge badge--neutral"
+              style={{ position: "absolute", top: 12, left: 12, zIndex: 5 }}
+            >
+              <IconCheck size={12} /> Workshop Feasibility Preview
+            </span>
 
-            <div className="scanline" />
+            {/* SCANLINE */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                background:
+                  "linear-gradient(180deg, transparent, rgba(168,80,58,0.1) 50%, transparent)",
+                height: "20%",
+                animation: "ka-scan 3s linear infinite",
+              }}
+            />
 
-            {/* GENERATIVE AI SPINNER OVERLAY */}
+            {/* GENERATING OVERLAY */}
             <div className="gen-overlay">
               <div className="spinner" />
-              <p style={{ fontWeight: 600, fontSize: 15, margin: "14px 0 2px" }}>
+              <p style={{ fontWeight: 600, fontSize: "1rem", margin: "14px 0 2px" }}>
                 {GEN_STEPS[stepIndex][0]}
               </p>
-              <small style={{ color: "var(--ink-soft)", fontSize: 13 }}>
+              <small className="text-muted" style={{ fontSize: "0.85rem" }}>
                 {GEN_STEPS[stepIndex][1]}
               </small>
             </div>
 
-            {/* PROCEDURAL VECTOR ARTWORK */}
-            <div style={{ width: "100%", height: 380, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <ProductSVG
-                type={product.svg}
-                cfg={{
-                  color: product.colors[cfg.colorIdx]?.h || "#C05F3C",
-                  pattern: cfg.pattern,
-                  text: cfg.text,
+            {/* ARTWORK DISPLAY */}
+            {previewMode === "photo" ? (
+              <img
+                src={product.images[0]}
+                alt={`${product.name} craft reference`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
                 }}
               />
-            </div>
+            ) : (
+              <div
+                style={{
+                  width: "82%",
+                  height: "82%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ProductSVG
+                  type="vase"
+                  cfg={{
+                    color: "var(--ka-clay)",
+                    pattern: selectedChoices["Pattern"]?.toLowerCase() || "none",
+                    text: Object.values(textInputs)[0] || "",
+                  }}
+                />
+              </div>
+            )}
           </div>
 
-          {/* PALETTE THUMBNAILS */}
-          <div className="thumbs" style={{ marginTop: 14 }}>
-            {product.colors.slice(0, 4).map((c, i) => (
-              <div
-                key={c.n}
-                className={`tn ${i === cfg.colorIdx ? "active" : ""}`}
-                onClick={() => setCfg((prev) => ({ ...prev, colorIdx: i }))}
-                title={c.n}
-              >
-                <ProductSVG type={product.svg} cfg={{ color: c.h, pattern: "none", text: "" }} />
-              </div>
-            ))}
+          {/* TOGGLE PREVIEW DISPLAY */}
+          <div className="row row--between" style={{ marginTop: 12 }}>
+            <span className="text-small text-muted">
+              Reference view: <strong>{previewMode === "photo" ? "Workshop photograph" : "Simulated vector render"}</strong>
+            </span>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={() => setPreviewMode((m) => (m === "photo" ? "vector" : "photo"))}
+            >
+              Switch to {previewMode === "photo" ? "Vector simulation" : "Photograph"}
+            </button>
           </div>
         </div>
 
-        {/* ================= RIGHT: CONFIGURATION CONTROLS ================= */}
+        {/* ================= RIGHT: SPECIFICATION CONTROLS ================= */}
         <div className="popt">
-          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ink-soft)", fontWeight: 700 }}>
-            {product.cat}
-          </span>
-          <h1 style={{ fontSize: "clamp(28px, 3.6vw, 40px)", margin: "6px 0 10px" }}>{product.name}</h1>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 4 }}>
+              Handmade to Order
+            </p>
+            <h1 style={{ fontSize: "clamp(1.6rem, 2.5vw, 2.2rem)", margin: "0 0 8px" }}>
+              {product.name}
+            </h1>
+            {artisan && (
+              <p className="text-small text-muted" style={{ margin: 0 }}>
+                Crafted by <strong>{artisan.name}</strong> ({artisan.location}) ·{" "}
+                {artisan.verified && (
+                  <span style={{ color: "var(--ka-success)", fontWeight: 600 }}>
+                    Verified Partner
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
 
-          {/* ARTISAN ATTRIBUTION */}
-          {artisan && (
-            <div className="pd-by">
-              <div className="av">
-                <AvatarSVG avatar={artisan.av} />
-              </div>
-              <div>
-                <b>{artisan.name}</b>
-                <span>
-                  {artisan.craft} · {artisan.loc} ·{" "}
-                  <span style={{ color: "var(--sage)", fontWeight: 700 }}>✓ Verified maker</span>
-                </span>
-              </div>
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, color: "var(--ochre)", fontWeight: 700 }}>
-                ★ {product.rating} <span style={{ color: "var(--ink-soft)", fontWeight: 400 }}>({product.reviews})</span>
-              </div>
-            </div>
-          )}
+          <div className="row" style={{ gap: 12 }}>
+            <strong style={{ fontSize: "1.5rem", color: "var(--ka-charcoal)" }}>
+              {formatINR(totalPrice)}
+            </strong>
+            <span className="badge badge--clay">Fair trade partner pricing</span>
+          </div>
 
-          <p style={{ color: "var(--ink-soft)", fontSize: 14, margin: "14px 0 12px", lineHeight: 1.6 }}>
-            {product.desc}
+          <p className="text-small text-muted" style={{ margin: 0 }}>
+            {product.description}
           </p>
 
-          <div className="pd-price" style={{ margin: "14px 0 4px" }}>
-            ${currentPrice.toFixed(2)} <small>artisan receives 100%</small>
-          </div>
-          <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 20 }}>
-            ⏱ Handcrafted to order in {product.lead} · worldwide insured carbon-neutral delivery
-          </div>
+          <hr className="divider" style={{ margin: "var(--sp-2) 0" }} />
 
-          {/* COLOR SWATCHES */}
-          <div className="opt-block">
-            <div className="lbl">
-              Color <b>{product.colors[cfg.colorIdx]?.n}</b>
-            </div>
-            <div className="swatches">
-              {product.colors.map((c, i) => (
-                <button
-                  key={c.n}
-                  className={`sw ${i === cfg.colorIdx ? "active" : ""}`}
-                  style={{ background: c.h }}
-                  title={c.n}
-                  onClick={() => setCfg((prev) => ({ ...prev, colorIdx: i }))}
-                  aria-label={c.n}
-                />
-              ))}
-            </div>
-          </div>
+          {/* DYNAMIC CUSTOMIZATION OPTIONS FROM STORE */}
+          {product.customization && product.customization.length > 0 ? (
+            product.customization.map((opt) => (
+              <div key={opt.label} className="field">
+                <span className="ka-option-label" id={`opt-${opt.label}`}>
+                  {opt.label}{" "}
+                  {opt.priceDelta && opt.priceDelta > 0 && (
+                    <small className="text-muted">(+{formatINR(opt.priceDelta)})</small>
+                  )}
+                </span>
 
-          {/* PATTERN SELECTOR */}
-          <div className="opt-block">
-            <div className="lbl">
-              Hand-applied Pattern <b>+$8 · applied by artisan</b>
-            </div>
-            <div className="pbtns">
-              {product.patterns.map((pt) => (
-                <button
-                  key={pt}
-                  className={`pbtn ${cfg.pattern === pt ? "active" : ""}`}
-                  onClick={() => setCfg((prev) => ({ ...prev, pattern: pt }))}
-                >
-                  {pt === "none" ? "Plain" : pt.charAt(0).toUpperCase() + pt.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
+                {opt.choices && (
+                  <div
+                    className="row row--wrap"
+                    style={{ gap: 8 }}
+                    role="radiogroup"
+                    aria-labelledby={`opt-${opt.label}`}
+                  >
+                    {opt.choices.map((ch) => {
+                      const checked = selectedChoices[opt.label] === ch;
+                      return (
+                        <label key={ch} className="ka-choice">
+                          <input
+                            type="radio"
+                            name={opt.label}
+                            value={ch}
+                            checked={checked}
+                            onChange={() =>
+                              setSelectedChoices((prev) => ({ ...prev, [opt.label]: ch }))
+                            }
+                          />
+                          <span>{ch}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
 
-          {/* SIZE SELECTOR */}
-          <div className="opt-block">
-            <div className="lbl">Dimensions &amp; Scale</div>
-            <div className="sbtns">
-              {product.sizes.map((s, i) => (
-                <button
-                  key={s.l}
-                  className={`sbtn ${cfg.sizeIdx === i ? "active" : ""}`}
-                  onClick={() => setCfg((prev) => ({ ...prev, sizeIdx: i }))}
-                >
-                  {s.l}
-                  {s.add > 0 ? ` +$${s.add}` : ""}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* PERSONAL ENGRAVING INPUT */}
-          {product.engrave && (
-            <div className="opt-block">
-              <div className="lbl">
-                Personal Engraving <b>+$5 · hand-carved or etched</b>
+                {opt.freeText && (
+                  <div>
+                    <input
+                      type="text"
+                      className="input"
+                      maxLength={opt.maxLength || 24}
+                      placeholder={opt.note || "Enter custom inscription or initials…"}
+                      value={textInputs[opt.label] || ""}
+                      onChange={(e) =>
+                        setTextInputs((prev) => ({ ...prev, [opt.label]: e.target.value }))
+                      }
+                      aria-labelledby={`opt-${opt.label}`}
+                    />
+                    {opt.maxLength && (
+                      <span
+                        className="text-small text-muted"
+                        style={{ display: "block", marginTop: 4, textAlign: "right" }}
+                      >
+                        {(textInputs[opt.label] || "").length} / {opt.maxLength} characters
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-              <input
-                className="engrave-in"
-                maxLength={18}
-                placeholder="e.g. your name, anniversary date, mantra…"
-                value={cfg.text}
-                onChange={(e) => setCfg((prev) => ({ ...prev, text: e.target.value }))}
-              />
-            </div>
+            ))
+          ) : (
+            <p className="text-small text-muted">
+              This piece is handcrafted in standard workshop editions.
+            </p>
           )}
 
-          {/* AI CUSTOMIZER BAR */}
-          <div className="ai-bar">
-            <div className="spark">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2l2.1 5.9L20 10l-5.9 2.1L12 18l-2.1-5.9L4 10l5.9-2.1L12 2z" />
-                <path d="M19 16l.9 2.4L22.5 19l-2.6.9L19 22l-.9-2.1-2.6-.9 2.6-.6L19 16z" />
-              </svg>
+          {/* GENERATE SIMULATION BUTTON */}
+          <div
+            className="card card--pad"
+            style={{
+              background: "var(--ka-stone)",
+              borderColor: "var(--ka-line-strong)",
+              marginTop: "var(--sp-3)",
+            }}
+          >
+            <div className="row" style={{ gap: 10, marginBottom: 8 }}>
+              <IconSparkle size={18} />
+              <strong style={{ fontSize: "0.95rem" }}>Bespoke Visual Feasibility</strong>
             </div>
-            <div>
-              <b>KALART Generative AI Studio</b>
-              <small>
-                Simulates natural craft glaze and textile drape in the maker's signature style — sent for artisan approval upon order.
-              </small>
-            </div>
+            <p className="text-small text-muted" style={{ margin: "0 0 12px" }}>
+              Simulates chosen variations against craft guidelines before handoff to the karigar.
+            </p>
             <button
-              className="ai-gen-btn"
+              type="button"
+              className="btn btn--secondary btn--sm"
               disabled={isGenerating}
-              onClick={handleGenerateMockup}
+              onClick={handleGenerate}
             >
-              {isGenerating ? "Generating…" : "✨ Generate mockup"}
+              <IconSparkle size={15} />{" "}
+              {isGenerating ? "Simulating variations…" : "Generate visual preview"}
             </button>
           </div>
 
-          {/* BUY & BASKET BUTTONS */}
-          <div className="buyrow">
-            <button className="btn btn-ghost" onClick={() => handleAddToBasket(false)}>
-              Add to basket · ${currentPrice.toFixed(2)}
+          {/* ACTIONS */}
+          <div className="row" style={{ gap: "var(--sp-3)", marginTop: "var(--sp-4)" }}>
+            <button
+              type="button"
+              className="btn btn--outline"
+              style={{ flex: 1 }}
+              onClick={() => handleAddToCart(false)}
+            >
+              Add to bag · {formatINR(totalPrice)}
             </button>
-            <button className="btn btn-primary" onClick={() => handleAddToBasket(true)}>
-              Buy now →
+            <button
+              type="button"
+              className="btn btn--primary"
+              style={{ flex: 1 }}
+              onClick={() => handleAddToCart(true)}
+            >
+              Buy now <IconArrowRight size={16} />
             </button>
           </div>
 
-          {/* CERTIFICATE NOTE */}
-          <div className="cert-note">
-            <div style={{ flexShrink: 0 }}>
-              <SealSVG />
-            </div>
+          <div
+            className="row"
+            style={{
+              gap: 8,
+              fontSize: "0.82rem",
+              color: "var(--ka-muted)",
+              marginTop: "var(--sp-2)",
+            }}
+          >
+            <IconShield size={16} />
             <span>
-              This bespoke commission ships with an authenticated <b>Certificate of Authenticity</b> (physical signed provenance seal + unique tracking ID), recorded on your order.
+              Ships with signed provenance card · 100% inspected by KALART before dispatch
             </span>
           </div>
         </div>

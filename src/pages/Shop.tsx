@@ -81,7 +81,7 @@ export default function Shop() {
       )}
 
       <div className="ka-shop">
-        <aside className={"ka-filters card card--pad" + (drawerOpen ? " is-open" : "")} aria-label="Product filters">
+        <aside className={"ka-filters ka-filters--drawer card card--pad" + (drawerOpen ? " is-open" : "")} aria-label="Product filters">
           <div className="row row--between" style={{ marginBottom: "var(--sp-3)" }}>
             <h2 style={{ fontSize: "1.05rem", margin: 0 }}>Refine</h2>
             <button className="btn btn--ghost btn--sm ka-mobile-only-inline" onClick={() => setDrawerOpen(false)} aria-label="Close filters"><IconClose size={16} /></button>

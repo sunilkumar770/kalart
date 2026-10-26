@@ -50,7 +50,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="ka-footer__bottom">
-          <span>© 2026 Kalart Crafts Pvt. Ltd. · Bengaluru · GSTIN 29AABCK1234D1Z5</span>
+          <span>© 2026 KALART · Bengaluru, India · Handcrafted heritage directly from master artisans</span>
           <span>Made with hand-set type and honest light.</span>
         </div>
       </div>

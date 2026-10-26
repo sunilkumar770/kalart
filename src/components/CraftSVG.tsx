@@ -135,7 +135,7 @@ export function renderProductSVGString(
     body = `<ellipse cx="200" cy="357" rx="98" ry="13" fill="#00000012"/><path d="${VASE_BODY}" fill="url(#${gr})"/>`;
   }
 
-  return `<svg class="psvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">${defs}${body}</svg>`;
+  return `<svg class="psvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-height:100%;display:block">${defs}${body}</svg>`;
 }
 
 export function ProductSVG({
@@ -153,7 +153,7 @@ export function ProductSVG({
   return (
     <div
       className={`craft-svg-wrap ${className}`}
-      style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", ...style }}
+      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", ...style }}
       dangerouslySetInnerHTML={{ __html: svgHtml }}
     />
   );

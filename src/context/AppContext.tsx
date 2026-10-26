@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { api, type CartLine, type User } from "../data/store";
+import { IconCheck, IconAlert, IconInfo } from "../components/icons";
 
 interface Toast {
   id: number;
@@ -31,8 +32,6 @@ interface AppCtx {
   toast: (kind: Toast["kind"], text: string) => void;
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
-  checkoutOpen: boolean;
-  setCheckoutOpen: (open: boolean) => void;
 }
 
 const Ctx = createContext<AppCtx | null>(null);
@@ -43,7 +42,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>(() => api.favorites());
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const tid = useRef(0);
 
   const refreshCart = useCallback(() => setCart([...api.cart()]), []);
@@ -112,8 +110,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toast,
       cartOpen,
       setCartOpen,
-      checkoutOpen,
-      setCheckoutOpen,
     }),
     [
       user,
@@ -127,19 +123,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       refreshFavorites,
       toast,
       cartOpen,
-      checkoutOpen,
     ]
   );
 
   return (
     <Ctx.Provider value={value}>
       {children}
-      <div id="toasts" className="toasts" role="status" aria-live="polite">
+      <div className="toast-region" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className="toast">
-            <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" width="16" height="16">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div key={t.id} className={`toast toast--${t.kind}`}>
+            <span aria-hidden="true" style={{ marginTop: 1, flex: "none" }}>
+              {t.kind === "success" ? (
+                <IconCheck size={16} />
+              ) : t.kind === "error" ? (
+                <IconAlert size={16} />
+              ) : (
+                <IconInfo size={16} />
+              )}
+            </span>
             <span>{t.text}</span>
           </div>
         ))}
