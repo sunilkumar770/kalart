@@ -1,16 +1,23 @@
 {
-  "name": "workspace",
+  "name": "kalart",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "kalart",
+    "indian-craft",
+    "artisans",
+    "react",
+    "vite"
+  ],
+  "author": "sunilkumar770",
   "license": "ISC",
-  "description": "",
+  "description": "KALART — Handmade Indian craft, customised with you",
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
