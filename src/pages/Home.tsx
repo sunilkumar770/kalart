@@ -25,6 +25,7 @@ export default function Home() {
   }, []);
 
   const verifiedArtisans = ARTISANS.filter((a) => a.verified);
+  const verifiedClustersCount = new Set(verifiedArtisans.map((a) => a.location)).size;
   const totalArtisansCount = ARTISANS.length;
 
   return (
@@ -34,7 +35,7 @@ export default function Home() {
         <div className="container ka-hero__grid">
           <div>
             <span className="badge badge--clay" style={{ marginBottom: "var(--sp-3)" }}>
-              <span className="dot" aria-hidden /> 0% commission on partner workshops
+              <span className="dot" aria-hidden /> Authentic Indian GI Handicrafts
             </span>
             <h1>Craft with a signature. Made for you, by them.</h1>
             <p className="lede">
@@ -79,15 +80,15 @@ export default function Home() {
               decoding="async"
               alt="Artisan at work in an Indian handloom workshop with woven textiles"
             />
-            <figcaption className="ka-hero__chip" style={{ bottom: 24, left: -8 }}>
+            <figcaption className="ka-hero__chip" style={{ bottom: 24, left: 16 }}>
               <span aria-hidden="true" style={{ color: "var(--ka-clay)" }}>
                 <IconLoom size={20} />
               </span>
               <span>
-                {totalArtisansCount} verified workshops
+                {verifiedArtisans.length} verified workshops
                 <br />
                 <small className="text-muted" style={{ fontWeight: 400 }}>
-                  across 9 traditional craft clusters
+                  across {verifiedClustersCount} traditional craft clusters
                 </small>
               </span>
             </figcaption>

@@ -14,6 +14,12 @@ export default function RequireRole({
   const { user, setUser, toast } = useApp();
   const location = useLocation();
 
+  const metaEnv = ((import.meta as any).env) || {};
+  const isDevOrTest =
+    Boolean(metaEnv.DEV) ||
+    metaEnv.MODE === "test" ||
+    (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("demo"));
+
   if (!user) {
     const demo = DEMO_ACCOUNTS.find((a) => a.role === role);
 
@@ -54,7 +60,7 @@ export default function RequireRole({
               Please sign in with authorized credentials.
             </p>
 
-            {demo && (
+            {demo && isDevOrTest && (
               <div
                 className="card card--pad"
                 style={{

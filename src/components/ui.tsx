@@ -262,8 +262,9 @@ export function Field({ label, htmlFor, hint, error, required, children }: {
       </label>
       {hint && <span className="hint" id={htmlFor + "-hint"}>{hint}</span>}
       {React.isValidElement(children) ? React.cloneElement(children as React.ReactElement<any>, {
-        "aria-describedby": (children.props as any)["aria-describedby"] || [hint ? htmlFor + "-hint" : null, error ? htmlFor + "-error" : null].filter(Boolean).join(" ") || undefined,
-        "aria-invalid": (children.props as any)["aria-invalid"] ?? (error ? true : undefined),
+        id: (children.props as any).id || htmlFor,
+        "aria-describedby": [(children.props as any)["aria-describedby"], hint ? htmlFor + "-hint" : null, error ? htmlFor + "-error" : null].filter(Boolean).join(" ") || undefined,
+        "aria-invalid": Boolean(error || (children.props as any)["aria-invalid"]),
       }) : children}
       {error && <span className="field-error" id={htmlFor + "-error"} role="alert"><IconAlert size={14} />{error}</span>}
     </div>

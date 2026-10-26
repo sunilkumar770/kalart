@@ -17,14 +17,44 @@ export default function CartDrawer() {
   const navigate = useNavigate();
   const drawerRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   // Close on Escape & trap focus
   useEffect(() => {
     if (!cartOpen) return;
 
+    // Save previous active element to restore upon closing
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setCartOpen(false);
+        return;
+      }
+
+      if (e.key === "Tab" && drawerRef.current) {
+        const focusables = drawerRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables || focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first || !drawerRef.current.contains(document.activeElement)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last || !drawerRef.current.contains(document.activeElement)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
     document.addEventListener("keydown", onKey);
@@ -37,12 +67,14 @@ export default function CartDrawer() {
     return () => {
       document.removeEventListener("keydown", onKey);
       clearTimeout(t);
+      previouslyFocusedRef.current?.focus();
     };
   }, [cartOpen, setCartOpen]);
 
   if (!cartOpen) return null;
 
   const subtotal = cart.reduce((s, c) => s + c.unitPrice * c.qty, 0);
+  const shipping = subtotal >= 2000 || subtotal === 0 ? 0 : 99;
 
   const handleProceedToCheckout = () => {
     setCartOpen(false);
@@ -103,7 +135,9 @@ export default function CartDrawer() {
             </div>
           ) : (
             cart.map((line, idx) => {
-              const p = PRODUCTS.find((x) => x.id === line.productId) || PRODUCTS[0];
+              const p = PRODUCTS.find((x) => x.id === line.productId);
+              const pName = p ? p.name : "Handmade Piece";
+              const pImg = p?.images?.[0] || "/img/hero-main.jpg";
               const optList = Object.entries(line.options || {}).map(
                 ([k, v]) => `${k}: ${v}`
               );
@@ -112,8 +146,8 @@ export default function CartDrawer() {
                 <div key={idx} className="cline">
                   <div className="cprev">
                     <img
-                      src={p.images[0]}
-                      alt={p.name}
+                      src={pImg}
+                      alt={pName}
                       width={72}
                       height={72}
                       loading="lazy"
@@ -121,7 +155,7 @@ export default function CartDrawer() {
                   </div>
                   <div className="cinfo">
                     <strong style={{ color: "var(--ka-charcoal)", lineHeight: 1.3 }}>
-                      {p.name}
+                      {pName}
                     </strong>
                     <span className="text-small text-muted" style={{ fontSize: "0.82rem" }}>
                       {optList.length ? optList.join(" · ") : "Standard edition"}
@@ -130,7 +164,7 @@ export default function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => setQty(idx, line.qty - 1)}
-                        aria-label={`Decrease quantity of ${p.name}`}
+                        aria-label={`Decrease quantity of ${pName}`}
                       >
                         <IconMinus size={12} />
                       </button>
@@ -140,7 +174,7 @@ export default function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => setQty(idx, line.qty + 1)}
-                        aria-label={`Increase quantity of ${p.name}`}
+                        aria-label={`Increase quantity of ${pName}`}
                       >
                         <IconPlus size={12} />
                       </button>
@@ -167,7 +201,7 @@ export default function CartDrawer() {
                         setQty(idx, 0);
                         toast("info", "Item removed from bag");
                       }}
-                      aria-label={`Remove ${p.name} from bag`}
+                      aria-label={`Remove ${pName} from bag`}
                     >
                       <IconTrash size={13} /> Remove
                     </button>
@@ -188,7 +222,7 @@ export default function CartDrawer() {
               <div>
                 <span className="text-muted">Shipping</span>
                 <span style={{ color: "var(--ka-success)", fontWeight: 600 }}>
-                  {subtotal >= 2000 ? "Free" : "₹150"}
+                  {shipping === 0 ? "Free" : "₹99"}
                 </span>
               </div>
               <div
@@ -202,7 +236,7 @@ export default function CartDrawer() {
               >
                 <span>Estimated total</span>
                 <span className="mono-num">
-                  {formatINR(subtotal >= 2000 ? subtotal : subtotal + 150)}
+                  {formatINR(subtotal + shipping)}
                 </span>
               </div>
             </div>

@@ -87,16 +87,21 @@ export default function Customize() {
     [product.artisanId]
   );
 
-  // Calculate dynamic price in INR
+  // Calculate dynamic price in INR matching ProductDetail
   const totalPrice = useMemo(() => {
     let sum = product.price;
     if (!product.customization) return sum;
 
     product.customization.forEach((opt) => {
-      if (opt.choices && opt.priceDelta) {
+      if (opt.choices) {
         const choice = selectedChoices[opt.label];
-        if (choice && choice !== opt.choices[0]) {
-          sum += opt.priceDelta;
+        if (choice) {
+          const deltaMatch = /\(\+₹([\d,]+)\)/.exec(choice);
+          if (deltaMatch) {
+            sum += Number(deltaMatch[1].replace(/,/g, ""));
+          } else if (choice !== opt.choices[0] && opt.priceDelta) {
+            sum += opt.priceDelta;
+          }
         }
       }
       if (opt.freeText && opt.priceDelta && textInputs[opt.label]?.trim()) {
@@ -105,6 +110,46 @@ export default function Customize() {
     });
     return sum;
   }, [product, selectedChoices, textInputs]);
+
+  const isPottery =
+    product.categorySlug === "pottery" ||
+    /vase|bowl|pot|terracotta|ceramic/i.test(product.name);
+
+  // Sync preview mode when product changes
+  useEffect(() => {
+    if (!isPottery) setPreviewMode("photo");
+  }, [isPottery]);
+
+  const chosenColor = (() => {
+    const c =
+      selectedChoices["Slip colour"] ||
+      selectedChoices["Colourway"] ||
+      selectedChoices["Glaze finish"] ||
+      selectedChoices["Color"];
+    if (!c) return "var(--ka-clay)";
+    const cl = c.toLowerCase();
+    if (cl.includes("indigo") || cl.includes("blue")) return "#2C4058";
+    if (cl.includes("sage") || cl.includes("green")) return "#5B705B";
+    if (cl.includes("sand") || cl.includes("cream") || cl.includes("bone")) return "#D8C5A8";
+    if (cl.includes("charcoal") || cl.includes("black")) return "#38332E";
+    if (cl.includes("ochre") || cl.includes("mustard")) return "#C9882B";
+    return "var(--ka-clay)";
+  })();
+
+  const chosenPattern = (() => {
+    const p =
+      selectedChoices["Border motif"] ||
+      selectedChoices["Slip colour"] ||
+      selectedChoices["Pattern"] ||
+      selectedChoices["Motif"] ||
+      selectedChoices["Glaze finish"];
+    if (!p) return "none";
+    const pl = p.toLowerCase();
+    if (pl.includes("dot") || pl.includes("floret") || pl.includes("bandhani")) return "bandhani";
+    if (pl.includes("wave") || pl.includes("fish") || pl.includes("river")) return "waves";
+    if (pl.includes("stripe") || pl.includes("line") || pl.includes("geometric")) return "stripes";
+    return "none";
+  })();
 
   const handleGenerate = () => {
     if (isGenerating) return;
@@ -119,7 +164,7 @@ export default function Customize() {
       } else {
         clearInterval(genInterval.current);
         setIsGenerating(false);
-        setPreviewMode("vector");
+        setPreviewMode(isPottery ? "vector" : "photo");
         toast("success", "Visual feasibility preview generated");
       }
     }, 600);
@@ -190,18 +235,7 @@ export default function Customize() {
               <IconCheck size={12} /> Workshop Feasibility Preview
             </span>
 
-            {/* SCANLINE */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                pointerEvents: "none",
-                background:
-                  "linear-gradient(180deg, transparent, rgba(168,80,58,0.1) 50%, transparent)",
-                height: "20%",
-                animation: "ka-scan 3s linear infinite",
-              }}
-            />
+
 
             {/* GENERATING OVERLAY */}
             <div className="gen-overlay">
@@ -215,7 +249,7 @@ export default function Customize() {
             </div>
 
             {/* ARTWORK DISPLAY */}
-            {previewMode === "photo" ? (
+            {previewMode === "photo" || !isPottery ? (
               <img
                 src={product.images[0]}
                 alt={`${product.name} craft reference`}
@@ -239,8 +273,8 @@ export default function Customize() {
                 <ProductSVG
                   type="vase"
                   cfg={{
-                    color: "var(--ka-clay)",
-                    pattern: selectedChoices["Pattern"]?.toLowerCase() || "none",
+                    color: chosenColor,
+                    pattern: chosenPattern,
                     text: Object.values(textInputs)[0] || "",
                   }}
                 />
@@ -251,15 +285,17 @@ export default function Customize() {
           {/* TOGGLE PREVIEW DISPLAY */}
           <div className="row row--between" style={{ marginTop: 12 }}>
             <span className="text-small text-muted">
-              Reference view: <strong>{previewMode === "photo" ? "Workshop photograph" : "Simulated vector render"}</strong>
+              Reference view: <strong>{isPottery ? (previewMode === "photo" ? "Workshop photograph" : "Simulated vector render") : "Workshop craft photograph"}</strong>
             </span>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={() => setPreviewMode((m) => (m === "photo" ? "vector" : "photo"))}
-            >
-              Switch to {previewMode === "photo" ? "Vector simulation" : "Photograph"}
-            </button>
+            {isPottery && (
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => setPreviewMode((m) => (m === "photo" ? "vector" : "photo"))}
+              >
+                Switch to {previewMode === "photo" ? "Vector simulation" : "Photograph"}
+              </button>
+            )}
           </div>
         </div>
 

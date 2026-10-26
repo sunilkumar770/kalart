@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, DEMO_ACCOUNTS, formatINR, PRODUCTS } from "../data/store";
+import { api, formatINR, PRODUCTS } from "../data/store";
 import { useApp } from "../context/AppContext";
 import { Field } from "../components/ui";
 import { IconArrowRight, IconCheck, IconShield } from "../components/icons";
@@ -45,16 +45,11 @@ export default function Checkout() {
     if (!validate()) { toast("error", "Please correct the highlighted fields."); return; }
     setPlacing(true);
     try {
-      // If signed out, sign in with the entered demo email when it matches an account,
-      // else continue as guest session so orders are retrievable.
+      // Continue as current user or create guest customer session so orders are retrievable.
       let u = user;
       if (!u) {
-        const acc = DEMO_ACCOUNTS.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
-        if (acc) u = await api.login(acc.email, "demo1234");
-        else {
-          u = { email: email.trim(), name: name.trim(), role: "customer" };
-          sessionStorage.setItem("kalart-session", JSON.stringify(u));
-        }
+        u = { email: email.trim(), name: name.trim(), role: "customer" };
+        sessionStorage.setItem("kalart-session", JSON.stringify(u));
         setUser(u);
       }
       const order = await api.placeOrder({ userEmail: u.email, address: addr, customNote: note || undefined });
