@@ -24,6 +24,7 @@ const NAV = [
 export default function Header() {
   const { user, cartCount, favorites, setUser, setCartOpen } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [craftsOpen, setCraftsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const craftsRef = useRef<HTMLLIElement>(null);
@@ -61,7 +62,7 @@ export default function Header() {
   return (
     <header className="ka-header">
       <div className="ka-announce" role="note">
-        Direct artisan trade · 0% commission on partner workshops · Free shipping over ₹2,000
+        Free shipping over Rs 2,000
       </div>
       <div className="container ka-header__inner">
         <button
@@ -169,7 +170,15 @@ export default function Header() {
           </ul>
         </nav>
 
-        <div className="ka-actions">
+                <div className="ka-actions">
+          <button
+            type="button"
+            className="ka-iconbtn ka-mobile-only"
+            aria-label="Search collection"
+            onClick={() => setSearchOpen((v) => !v)}
+          >
+            <IconSearch size={20} />
+          </button>
           <form
             role="search"
             action="/shop"
@@ -281,7 +290,7 @@ export default function Header() {
       </div>
 
       {/* Mobile search bar */}
-      {mobileOpen && (
+      {(mobileOpen || searchOpen) && (
         <div className="container ka-mobile-search">
           <form
             role="search"

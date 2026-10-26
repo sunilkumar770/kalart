@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Artisan, Product } from "../data/store";
+import { ARTISANS } from "../data/store";
 import { formatINR } from "../data/store";
 import { useApp } from "../context/AppContext";
 import { IconHeart, IconStar, IconCheck, IconSearch, IconArrowRight, IconUpload, IconAlert, IconInfo, IconClose } from "./icons";
@@ -133,6 +134,7 @@ export function FavoriteButton({ productId, floating = false, productName }: { p
 
 // ---------------------------------------------------------------- Product card
 export function ProductCard({ product }: { product: Product }) {
+  const artisan = ARTISANS.find((a) => a.id === product.artisanId);
   return (
     <article className="card ka-product-card" style={{ position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <Link to={`/product/${product.slug}`} aria-label={product.name} style={{ textDecoration: "none", color: "inherit" }}>
@@ -147,6 +149,11 @@ export function ProductCard({ product }: { product: Product }) {
         <span className="badge badge--clay" style={{ position: "absolute", top: 10, left: 10 }}>Bestseller</span>
       )}
       <div style={{ padding: "14px 16px 16px", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+        {artisan && (
+          <span className="text-small text-muted" style={{ fontSize: "0.78rem", fontWeight: 500, letterSpacing: "0.02em" }}>
+            {artisan.name} · {artisan.location}
+          </span>
+        )}
         <Link to={`/product/${product.slug}`} style={{ textDecoration: "none" }}>
           <h3 style={{ fontSize: "1.02rem", margin: 0, lineHeight: 1.3 }}>{product.name}</h3>
         </Link>
@@ -316,6 +323,56 @@ export function UploadBox({ onUploaded }: { onUploaded: (fileName: string) => vo
       {name && (
         <span className="badge badge--success" style={{ marginTop: 10 }}><IconCheck size={12} /> Uploaded: {name}</span>
       )}
+    </div>
+  );
+}
+
+
+// ---------------------------------------------------------------- Carousel Artisan Card
+export function ArtisanCarouselCard({ artisan }: { artisan: Artisan }) {
+  const years = new Date().getFullYear() - artisan.since;
+  const quote = artisan.story.split(".")[0] + ".";
+  return (
+    <article className="ka-maker-card">
+      <div className="ka-maker-card__head">
+        <img
+          src={artisan.image}
+          alt={`Portrait of ${artisan.name}`}
+          width={60}
+          height={60}
+          className="ka-maker-card__avatar"
+          loading="lazy"
+          decoding="async"
+        />
+        <div>
+          <h3 className="ka-maker-card__name">{artisan.name}</h3>
+          <p className="ka-maker-card__meta">
+            {artisan.craft} · {years} years practicing
+          </p>
+          <p className="ka-maker-card__loc">{artisan.location}</p>
+        </div>
+      </div>
+      <p className="ka-maker-card__quote">"{quote}"</p>
+      <Link to={`/shop?artisan=${artisan.id}`} className="ka-maker-card__link">
+        View pieces <IconArrowRight size={14} />
+      </Link>
+    </article>
+  );
+}
+
+export function ArtisanCardSkeleton() {
+  return (
+    <div className="ka-maker-card" aria-hidden="true">
+      <div className="ka-maker-card__head">
+        <div className="skeleton" style={{ width: 60, height: 60, borderRadius: "50%" }} />
+        <div style={{ flex: 1, display: "grid", gap: 6 }}>
+          <div className="skeleton" style={{ height: 16, width: "60%" }} />
+          <div className="skeleton" style={{ height: 12, width: "80%" }} />
+          <div className="skeleton" style={{ height: 12, width: "50%" }} />
+        </div>
+      </div>
+      <div className="skeleton" style={{ height: 36, width: "100%", marginTop: 12 }} />
+      <div className="skeleton" style={{ height: 14, width: "40%", marginTop: 12 }} />
     </div>
   );
 }

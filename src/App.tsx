@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import CartDrawer from "./components/CartDrawer";
+import BottomNav from "./components/BottomNav";
 import RequireRole from "./components/RequireRole";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -115,6 +116,7 @@ export default function App() {
       </div>
       <Footer />
       <CartDrawer />
+      <BottomNav />
     </div>
   );
 }
