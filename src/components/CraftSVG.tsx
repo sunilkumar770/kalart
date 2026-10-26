@@ -117,7 +117,7 @@ export function renderProductSVGString(
       ${cfg.text ? `<text x="200" y="284" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="20" fill="${ink}" opacity=".8" letter-spacing="2">${esc(cfg.text.slice(0, 10))}</text>` : ""}`;
   } else if (type === "candle") {
     const flame = (x: number, y: number, s: number) =>
-      `<ellipse cx="${x}" cy="${y - 6 * s}" rx="${10 * s}" ry="${10 * s}" fill="#D9A441" opacity=".22"/><path d="M${x},${y - 26 * s} q${9 * s},${12 * s} 0,${22 * s} q${-9 * s},-10 * s 0,-${22 * s}z" fill="#E8A33D"/><path d="M${x},${y - 18 * s} q${4.5 * s},${8 * s} 0,${14 * s} q${-4.5 * s},-6 * s 0,-${14 * s}z" fill="#F5D26B"/>`;
+      `<ellipse cx="${x}" cy="${y - 6 * s}" rx="${10 * s}" ry="${10 * s}" fill="#D9A441" opacity=".22"/><path d="M${x},${y - 26 * s} q${9 * s},${12 * s} 0,${22 * s} q${-9 * s},${-10 * s} 0,${-22 * s}z" fill="#E8A33D"/><path d="M${x},${y - 18 * s} q${4.5 * s},${8 * s} 0,${14 * s} q${-4.5 * s},${-6 * s} 0,${-14 * s}z" fill="#F5D26B"/>`;
     body = `<ellipse cx="200" cy="342" rx="120" ry="12" fill="#00000012"/>
       <rect x="112" y="150" width="62" height="180" rx="10" fill="#F1E4C8"/><rect x="112" y="150" width="16" height="180" rx="8" fill="#fff" opacity=".4"/>
       <line x1="143" y1="150" x2="143" y2="138" stroke="#4A3B2A" stroke-width="3.5" stroke-linecap="round"/>${flame(143, 136, 1)}
