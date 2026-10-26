@@ -7,6 +7,7 @@ import { IconBag, IconHeart, IconMenu, IconClose, IconSearch, IconUser, IconChev
 const NAV = [
   { to: "/shop", label: "Shop" },
   { to: "/crafts", label: "Crafts" },
+  { to: "/gallery", label: "GI Library" },
   { to: "/artisans", label: "Artisans" },
   { to: "/customize", label: "Customise" },
   { to: "/about", label: "Our story" },
@@ -18,7 +19,7 @@ export default function Header() {
   const [craftsOpen, setCraftsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const craftsRef = useRef<HTMLLIElement>(null);
-  const acctRef = useRef<HTMLLIElement>(null);
+  const acctRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
 
   // close menus on outside click + Escape

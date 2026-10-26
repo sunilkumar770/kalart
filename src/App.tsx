@@ -18,11 +18,13 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ArtisanDashboard from "./pages/ArtisanDashboard";
 import Legal, { NotFound } from "./pages/Legal";
 import { About, Help, Sell } from "./pages/StaticPages";
+import Gallery from "./pages/Gallery";
 
 const TITLES: Record<string, string> = {
   "/": "KALART — Handmade Indian craft, customised with you",
   "/shop": "Shop handmade pieces · KALART",
   "/crafts": "Browse by craft · KALART",
+  "/gallery": "GI Craft Library · KALART",
   "/artisans": "Meet the artisans · KALART",
   "/customize": "Customisation studio · KALART",
   "/cart": "Your bag · KALART",
@@ -63,6 +65,7 @@ export default function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:slug" element={<ProductDetail />} />
           <Route path="/crafts" element={<CraftsIndex />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/crafts/:slug" element={<CraftDetail />} />
           <Route path="/artisans" element={<ArtisansPage />} />
           <Route path="/artisan/:id" element={<ArtisanProfile />} />

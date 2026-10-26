@@ -210,7 +210,7 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
     <div>
       <div style={{ position: "relative", aspectRatio: "1/1", borderRadius: "var(--r-lg)", overflow: "hidden", background: "var(--ka-stone)", border: "1px solid var(--ka-line)" }}>
         <img key={i} src={images[i]} alt={`${name} — view ${i + 1} of ${images.length}`}
-          width={900} height={900} fetchpriority={i === 0 ? "high" : undefined} decoding="async"
+          width={900} height={900} fetchPriority={i === 0 ? "high" : undefined} decoding="async"
           style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         {images.length > 1 && (
           <>
@@ -273,7 +273,7 @@ export function ConfirmDialog({ openRef, title, body, confirmLabel, danger, onCo
   title: string; body: string; confirmLabel: string; danger?: boolean; onConfirm: () => void;
 }) {
   return (
-    <dialog ref={openRef} className="ka-dialog" aria-labelledby="cd-title">
+    <dialog ref={openRef as React.RefObject<HTMLDialogElement>} className="ka-dialog" aria-labelledby="cd-title">
       <div className="ka-dialog__head"><h3 id="cd-title" style={{ margin: 0 }}>{title}</h3></div>
       <div className="ka-dialog__body"><p style={{ margin: 0 }} className="text-muted">{body}</p></div>
       <div className="ka-dialog__foot">

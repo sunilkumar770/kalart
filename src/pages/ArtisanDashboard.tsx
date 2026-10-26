@@ -36,7 +36,7 @@ export default function ArtisanDashboard() {
 
   const act = async (id: string, patch: Partial<DesignRequest>, msg: string) => {
     await api.updateRequest(id, patch);
-    setRequests((rs) => rs?.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    setRequests((rs) => (rs ? rs.map((r) => (r.id === id ? { ...r, ...patch } : r)) : rs));
     toast("success", msg);
   };
 
