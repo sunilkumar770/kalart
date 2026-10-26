@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Canonical list of the 29 GI-tagged handicrafts / handlooms of Telangana (TG)
+and Andhra Pradesh (AP), with slugs, English craft names, and curated search
+queries for real-world reference-image sourcing (Wikimedia Commons).
+
+Used by tools/fetch_references.py.
+"""
+
+# (slug, exact_craft_name, state, [search queries...])
+GI_ARTS = [
+    ("pochampally-ikat", "Pochampally Ikat", "Telangana",
+     ["Pochampally ikat", "Pochampalli sari", "Telia rumal"]),
+    ("sircilla-koya", "Sircilla Koya Silk Cotton Blend", "Telangana",
+     ["Sircilla saree", "Sircilla handloom", "Koya silk cotton"]),
+    ("nirmal-toys", "Nirmal Toy & Woodcarving", "Telangana",
+     ["Nirmal toys", "Nirmal wood carving"]),
+    ("bidri-metalware", "Bidri Metalware", "Telangana",
+     ["Bidriware", "Bidar metal inlay"]),
+    ("hjam-haram", "Hjam-Haram (Bengali Hilli)", "Telangana",
+     ["Hjam haram", "Dhokra casting tribal", "Bell metal craft India"]),
+    ("dharmavaram-pattu", "Dharmavaram Pattu Saree", "Andhra Pradesh",
+     ["Dharmavaram saree", "ధర్మవరం చీర", "Dharmavaram handloom", "silk saree Anantapur"]),
+    ("puttapaka-kalamkari", "Puttapaka Kalamkari", "Telangana",
+     ["Puttapaka kalamkari", "Kalamkari block print", "Kalamkari textile India"]),
+    ("sholapur-phulkari", "Sholapur Phulkari", "Telangana",
+     ["Phulkari embroidery", "Hyderabad phulkari shawl"]),
+    ("mangalagiri-fabric", "Mangalagiri Fabric", "Andhra Pradesh",
+     ["Mangalagiri saree", "Mangalagiri handloom", "Mangalgiri fabric", "cotton saree Guntur handloom"]),
+    ("venkatagiri-fabric", "Venkatagiri Fabric", "Andhra Pradesh",
+     ["Venkatagiri saree", "Venkatagiri handloom"]),
+    ("narayanpet-textile", "Narayanpet Textile", "Telangana",
+     ["Narayanpet saree", "Narayanpet handloom"]),
+    ("gajnuma-jewellery", "Gajnuma Jewellery", "Telangana",
+     ["Gajnuma jewellery", "Hyderabad pearl jewellery", "Traditional beads India"]),
+    ("pokkal-dollu", "Pokkal Dollu (Goblem Brooms)", "Telangana",
+     ["Thattera broom", "Grass broom handicraft India", "Deccan grass fibre craft"]),
+    ("machilipatnam-kalamkari", "Machilipatnam Kalamkari", "Andhra Pradesh",
+     ["Machilipatnam kalamkari", "Masulipatnam textile painting", "Kalamkari wall hanging"]),
+    ("srikalahasti-kalamkari", "Srikalahasti Kalamkari", "Andhra Pradesh",
+     ["Srikalahasti kalamkari", "Kalamkari pen drawing", "Kalamkari mythological painting"]),
+    ("monsoon-hemp-craft", "Monsoon Hemp Craft", "Telangana",
+     ["Sannakki hill grass craft", "Wild hemp bag India", "Sanaki grass Telangana"]),
+    ("cheriyal-scroll-painting", "Cheriyal Scroll Painting", "Telangana",
+     ["Cheriyal scroll", "Chitrakala folk painting Telangana"]),
+    ("kondapalli-bommalu", "Kondapalli Bommalu Wooden Toys", "Andhra Pradesh",
+     ["Kondapalli toy", "Kondapalli wooden dolls"]),
+    ("etikoppaka-toys", "Etikoppaka Lacquered Wooden Toys", "Andhra Pradesh",
+     ["Etikoppaka toy", "Lakka bommalu", "Rallagalla lacquer craft", "lacquered wooden toys Visakhapatnam"]),
+    ("silver-filigree-karimnagar", "Silver Filigree of Karimnagar", "Telangana",
+     ["Silver filigree jewelry", "Tarakasi filigree", "Filigree silver work India"]),
+    ("dumka-weaving", "Dumka Weaving (Dhokra)", "Telangana",
+     ["Dhokra artifact", "Dokra tribal casting", "Zinc bell metal figurine"]),
+    ("panchala-toy", "Panchala Toy", "Andhra Pradesh",
+     ["Pithala toy", "Terracotta toy Andhra Pradesh", "Clay doll craft India"]),
+    ("vijayawada-lace", "Vijayawada Lace", "Andhra Pradesh",
+     ["Vuyyuru lace", "Handmade lace fabric India", "Crochet lace textile"]),
+    ("banarasi-weaving-suravali", "Banarasi Weaving (Suravali)", "Andhra Pradesh",
+     ["Banarasi saree weave", "Banaras brocade fabric"]),
+    ("visakhapatrayaniya-saree", "Visakhapatrayaniya Saree", "Andhra Pradesh",
+     ["Visakhapatnam handloom saree", "Tribal border saree Andhra"]),
+    ("vinukonda-yerpadu-turi-dhandiki", "Vinukonda Yerpadu, Turi & Dhandiki", "Andhra Pradesh",
+     ["Wooden mortar pestle India", "Ukhal wooden craft", "Dinduki grinding wood"]),
+    ("simhachalam-namasavali", "Simhachalam Namdavali", "Andhra Pradesh",
+     ["Namdavali bamboo craft", "Bamboo basket Vizianagaram", "Coconut leaf basket craft"]),
+    ("pedana-woodwork-vadrang", "Pedana Woodwork Vadrangi", "Andhra Pradesh",
+     ["Pedana toys", "Pedana wood craft", "Wooden toy carving Andhra"]),
+    ("rajahmundry-wood-carving", "Rajahmundry Wood Carving", "Andhra Pradesh",
+     ["Rajahmundry wooden craft", "Pithala work Godavari", "Wood carving East Godavari"]),
+]
+
+assert len(GI_ARTS) == 29, f"expected 29 GI arts, got {len(GI_ARTS)}"

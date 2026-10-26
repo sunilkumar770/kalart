@@ -1,0 +1,78 @@
+/* =============================================================
+   KALART Design System — design tokens
+   Direction: warm ivory + natural stone, charcoal ink, muted
+   terracotta primary, deep indigo secondary, restrained brass gold.
+   Traditional Indian craft character, contemporary premium UI.
+   ============================================================= */
+:root {
+  /* Surfaces */
+  --ka-ivory: #faf7f0;        /* page background */
+  --ka-cream: #f3ecdf;        /* alternate section band */
+  --ka-stone: #e9e1d0;        /* subtle chips / wells */
+  --ka-surface: #ffffff;      /* cards */
+  --ka-surface-ink: #26211c;  /* dark surfaces (footer) */
+
+  /* Ink / text */
+  --ka-charcoal: #2b2620;     /* headings */
+  --ka-ink: #4a4238;          /* body text */
+  --ka-muted: #7d7365;        /* secondary text */
+  --ka-faint: #a89e8d;        /* disabled / meta */
+
+  /* Brand */
+  --ka-clay: #a8503a;         /* primary accent (muted terracotta) */
+  --ka-clay-deep: #7c3a29;    /* hover / pressed */
+  --ka-clay-soft: #f2e0d6;    /* tinted background */
+  --ka-indigo: #2e3d63;       /* secondary accent */
+  --ka-indigo-deep: #222e4c;
+  --ka-indigo-soft: #e2e7f0;
+  --ka-gold: #b08d3e;         /* hairlines & ornaments only */
+  --ka-gold-soft: #efe5cd;
+
+  /* Status (never the sole signal — always paired with label/icon) */
+  --ka-success: #3f6b4a;
+  --ka-success-soft: #e2ecdf;
+  --ka-warning: #96620f;
+  --ka-warning-soft: #f6ead2;
+  --ka-error: #a03028;
+  --ka-error-soft: #f4e0dd;
+  --ka-info: #3c5a78;
+  --ka-info-soft: #e0eaf2;
+
+  /* Lines */
+  --ka-line: #ddd4c3;
+  --ka-line-strong: #c4b8a2;
+  --ka-focus: #2e3d63;
+
+  /* Typography */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Spacing scale (4px base) */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px;
+
+  /* Radii */
+  --r-sm: 4px; --r-md: 8px; --r-lg: 14px; --r-pill: 999px;
+
+  /* Elevation */
+  --sh-sm: 0 1px 2px rgba(43, 38, 32, 0.06), 0 1px 4px rgba(43, 38, 32, 0.05);
+  --sh-md: 0 2px 6px rgba(43, 38, 32, 0.08), 0 8px 20px rgba(43, 38, 32, 0.07);
+  --sh-lg: 0 6px 16px rgba(43, 38, 32, 0.10), 0 18px 44px rgba(43, 38, 32, 0.12);
+
+  /* Layout */
+  --page-max: 1240px;
+  --header-h: 64px;
+
+  /* Motion */
+  --t-fast: 140ms ease;
+  --t-med: 240ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
