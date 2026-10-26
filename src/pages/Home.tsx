@@ -1,161 +1,310 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { api, ARTISANS, CATEGORIES, PRODUCTS, type Product } from "../data/store";
-import { ArtisanCard, CategoryTile, ProductCard, GridSkeleton } from "../components/ui";
-import { IconArrowRight, IconCheck, IconLoom, IconShield, IconSparkle, IconTruck } from "../components/icons";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useApp } from "../context/AppContext";
+import {
+  SHOWCASE_PRODUCTS,
+  SHOWCASE_ARTISANS,
+  getArtisanById,
+  ShowcaseProduct,
+} from "../data/showcaseData";
+import { ProductSVG, AvatarSVG } from "../components/CraftSVG";
 
 export default function Home() {
-  const [featured, setFeatured] = useState<Product[] | null>(null);
-  const [customisables, setCustomisables] = useState<Product[] | null>(null);
+  const { toggleFavorite, favorites, toast } = useApp();
+  const [activeCategory, setActiveCategory] = useState("All");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    let live = true;
-    api.listProducts({ sort: "rating" }).then((p) => live && setFeatured(p.slice(0, 4)));
-    api.listProducts({ customOnly: true }).then((p) => live && setCustomisables(p.slice(0, 4)));
-    return () => { live = false; };
-  }, []);
+  const categories = ["All", "Ceramics", "Textiles", "Jewelry", "Woodwork", "Leather"];
+
+  const filteredProducts =
+    activeCategory === "All"
+      ? SHOWCASE_PRODUCTS
+      : SHOWCASE_PRODUCTS.filter((p) => p.cat.toLowerCase() === activeCategory.toLowerCase());
+
+  const verifiedArtisans = SHOWCASE_ARTISANS.filter((a) => a.verified);
+
+  const handleFavoriteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    toggleFavorite(id);
+    const isFav = favorites.includes(id);
+    toast(isFav ? "info" : "success", isFav ? "Removed from saved pieces" : "Saved to favorites ♥");
+  };
 
   return (
-    <main id="main">
-      {/* HERO */}
-      <section className="ka-hero">
-        <div className="container ka-hero__grid">
-          <div>
-            <p className="eyebrow">Handmade in India · Verified artisans</p>
-            <h1>Craft with a signature. Made for you, by them.</h1>
-            <p className="lede">
-              KALART connects you directly with master weavers, potters and painters —
-              so you can commission authentic handmade pieces, preview every customisation,
-              and approve the design before it reaches the loom or the wheel.
-            </p>
-            <div className="ka-hero__cta">
-              <Link to="/shop" className="btn btn--primary">Shop the collection <IconArrowRight size={16} /></Link>
-              <Link to="/customize" className="btn btn--outline"><IconSparkle size={16} /> Start a custom order</Link>
-            </div>
-            <div className="row row--wrap" style={{ marginTop: "var(--sp-5)", gap: "var(--sp-4)", color: "var(--ka-muted)", fontSize: "0.86rem" }}>
-              <span className="row" style={{ gap: 6 }}><IconShield size={16} /> Artisan-verified listings</span>
-              <span className="row" style={{ gap: 6 }}><IconTruck size={16} /> Ships pan-India in 7–16 days</span>
-              <span className="row" style={{ gap: 6 }}><IconCheck size={16} /> Preview &amp; approve before production</span>
-            </div>
-          </div>
-          <figure className="ka-hero__figure" style={{ margin: 0 }}>
-            <img src="/img/hero-main.jpg" width={1400} height={1000} fetchPriority="high" decoding="async"
-              alt="Illustrated scene of an artisan draped in an indigo handloom saree beside a lit diya, under a carved arch" />
-            <figcaption className="ka-hero__chip" style={{ bottom: 24, left: -8 }}>
-              <span aria-hidden style={{ color: "var(--ka-clay)" }}><IconLoom size={20} /></span>
-              <span>38 workshops<br /><small className="text-muted" style={{ fontWeight: 400 }}>across 9 craft clusters</small></span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      {/* CATEGORIES */}
-      <section className="section" aria-labelledby="cats-h">
-        <div className="container">
-          <div className="row row--between" style={{ marginBottom: "var(--sp-5)", flexWrap: "wrap", gap: "var(--sp-3)" }}>
-            <h2 id="cats-h" style={{ margin: 0 }}>Browse by craft</h2>
-            <Link to="/crafts" className="btn btn--ghost btn--sm">All crafts <IconArrowRight size={14} /></Link>
-          </div>
-          <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "var(--sp-5)" }}>
-            {CATEGORIES.map((c) => <CategoryTile key={c.slug} {...c} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURED */}
-      <section className="section band-cream" aria-labelledby="feat-h">
-        <div className="container">
-          <p className="eyebrow text-center ornament" id="feat-h" style={{ justifyContent: "center", display: "flex" }}>Most loved this season</p>
-          <h2 className="text-center" style={{ marginTop: 0 }}>Pieces that carry their maker's handwriting</h2>
-          <div style={{ height: "var(--sp-5)" }} />
-          {!featured ? <GridSkeleton n={4} /> : (
-            <div className="grid grid-p4">{featured.map((p) => <ProductCard key={p.id} product={p} />)}</div>
-          )}
-          <div className="text-center" style={{ marginTop: "var(--sp-6)" }}>
-            <Link to="/shop?sort=rating" className="btn btn--secondary">Browse top-rated work <IconArrowRight size={16} /></Link>
-          </div>
-        </div>
-      </section>
-
-      {/* EDITORIAL STORY */}
-      <section className="section">
-        <div className="container ka-split">
-          <div>
-            <p className="eyebrow">Why handmade matters</p>
-            <h2>The slight blur in an ikat is not a defect. It's a decision.</h2>
-            <p className="lede">
-              Machine printing repeats; hands respond. When Ravi ties a warp thread he is choosing how
-              much indigo the fibre keeps. When Meera grinds stone pigment she decides how a monsoon sky
-              should feel. KALART pays these decisions properly — artisans set their own prices and keep
-              85% of every sale.
-            </p>
-            <p className="lede">
-              Every listing states what is made to order, what can be customised, and exactly when your
-              piece will ship — before you commit anything.
-            </p>
-            <Link to="/about" className="btn btn--outline">Read our sourcing charter <IconArrowRight size={15} /></Link>
-          </div>
-          <div className="grid grid-p2" style={{ gap: "var(--sp-4)" }}>
-            <img src="/img/story-workshop.jpg" width={800} height={800} loading="lazy" decoding="async"
-              alt="Weaver at a pit loom in a sunlit workshop"
-              style={{ borderRadius: "var(--r-lg)", aspectRatio: "3/4", objectFit: "cover", boxShadow: "var(--sh-md)" }} />
-            <div className="stack" style={{ gap: "var(--sp-4)" }}>
-              <img src="/img/story-print.jpg" width={900} height={900} loading="lazy" decoding="async"
-                alt="Indigo block-print cloth drying on a line"
-                style={{ borderRadius: "var(--r-lg)", aspectRatio: "1/1", objectFit: "cover" }} />
-              <div className="card card--pad">
-                <strong style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "var(--ka-charcoal)" }}>₹2.4 Cr+</strong>
-                <p className="text-small text-muted" style={{ margin: 0 }}>paid directly to partner workshops in 2026</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CUSTOMISATION TEASER */}
-      <section className="section band-stone" aria-labelledby="cust-h">
-        <div className="container">
-          <div className="row row--between" style={{ marginBottom: "var(--sp-5)", flexWrap: "wrap", gap: "var(--sp-3)" }}>
-            <div>
-              <p className="eyebrow" id="cust-h" style={{ marginBottom: 4 }}>The KALART difference</p>
-              <h2 style={{ margin: 0 }}>Commission it your way — see it first</h2>
-            </div>
-            <Link to="/customize" className="btn btn--primary">Open the studio <IconArrowRight size={16} /></Link>
-          </div>
-          <div className="ka-steps">
-            <div className="ka-step"><h3 style={{ fontSize: "1.05rem" }}>Choose a base piece</h3><p className="text-small text-muted">Start from real photography of what the workshop makes today.</p></div>
-            <div className="ka-step"><h3 style={{ fontSize: "1.05rem" }}>Adjust colour, size, text</h3><p className="text-small text-muted">Only options the artisan has marked feasible are offered.</p></div>
-            <div className="ka-step"><h3 style={{ fontSize: "1.05rem" }}>Review a generated preview</h3><p className="text-small text-muted">Previews are clearly labelled as AI-assisted visualisations, never promises.</p></div>
-            <div className="ka-step"><h3 style={{ fontSize: "1.05rem" }}>Approve &amp; the artisan begins</h3><p className="text-small text-muted">A human karigar signs off feasibility and final pricing before production.</p></div>
-          </div>
-          <div style={{ height: "var(--sp-6)" }} />
-          {!customisables ? <GridSkeleton n={4} /> : (
-            <div className="grid grid-p4">{customisables.map((p) => <ProductCard key={p.id} product={p} />)}</div>
-          )}
-        </div>
-      </section>
-
-      {/* ARTISANS */}
-      <section className="section">
-        <div className="container">
-          <div className="row row--between" style={{ marginBottom: "var(--sp-5)", flexWrap: "wrap", gap: "var(--sp-3)" }}>
-            <h2 style={{ margin: 0 }}>Meet the makers</h2>
-            <Link to="/artisans" className="btn btn--ghost btn--sm">All artisans <IconArrowRight size={14} /></Link>
-          </div>
-          <div className="grid grid-p4">
-            {ARTISANS.filter((a) => a.verified).slice(0, 4).map((a) => <ArtisanCard key={a.id} artisan={a} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA band */}
-      <section className="band-ink" style={{ background: "var(--ka-surface-ink)", paddingBlock: "var(--sp-8)" }}>
-        <div className="container text-center">
-          <h2 style={{ color: "#f3ecdf" }}>Practice your craft. We'll handle the rest.</h2>
-          <p style={{ color: "#b9ae97", maxWidth: "54ch", margin: "0 auto var(--sp-5)" }}>
-            Join 38 partner workshops earning without middlemen. Set your price, your lead time, your limits.
+    <main id="main" className="kalart-home">
+      {/* ================= HERO SECTION ================= */}
+      <section className="hero">
+        <div>
+          <span className="badge">
+            <span className="dot" /> 0% commission — artisans keep every cent
+          </span>
+          <h1>
+            Handmade treasures, <em>designed by you</em>, crafted by verified artisans.
+          </h1>
+          <p className="lead">
+            KALART connects you directly with master artisans. Customize any piece with AI-generated mockups,
+            approve the design, and receive it with a signed certificate of authenticity.
           </p>
-          <Link to="/sell" className="btn btn--primary">Become an artisan partner <IconArrowRight size={16} /></Link>
+          <div className="cta-row">
+            <a href="#discover" className="btn btn-primary" onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("discover")?.scrollIntoView({ behavior: "smooth" });
+            }}>
+              Explore the collection →
+            </a>
+            <Link to="/customize" className="btn btn-ghost">
+              ✨ AI Customizer
+            </Link>
+            <Link to="/artisan" className="btn btn-dark">
+              Artisan Studio
+            </Link>
+          </div>
+
+          <div className="hero-stats">
+            <div>
+              <b>100%</b>
+              <span>to artisans</span>
+            </div>
+            <div>
+              <b>0%</b>
+              <span>platform fee</span>
+            </div>
+            <div>
+              <b>4.9 / 5</b>
+              <span>maker rating</span>
+            </div>
+            <div>
+              <b>100%</b>
+              <span>verified origin</span>
+            </div>
+          </div>
+        </div>
+
+        {/* HERO ARCH ARTWORK */}
+        <div className="hero-art">
+          <div className="arch">
+            <div className="ring" style={{ width: 440, height: 440, top: -40, left: -40 }} />
+            <div className="ring" style={{ width: 320, height: 320, top: 40, left: 30 }} />
+            <div className="ring" style={{ width: 180, height: 180, bottom: 20, right: -20 }} />
+          </div>
+
+          <div id="heroVase" style={{ position: "relative", zIndex: 2, height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ProductSVG
+              type="vase"
+              cfg={{ color: "#C05F3C", pattern: "waves", text: "" }}
+              style={{ transform: "scale(1.08)" }}
+            />
+          </div>
+
+          <div className="floating-card">
+            <span className="vbadge">✓ Verified maker</span>
+            <b>Meera Kapoor</b>
+            <span>Jaipur, India · Terracotta</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= TRUST BAR ================= */}
+      <div className="trust-bar" style={{ maxWidth: 1200, margin: "24px auto 10px", padding: "0 24px" }}>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <div>
+            <b>Direct artisan trade</b>
+            <p>No middlemen markups</p>
+          </div>
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 6v6l4 2" />
+          </svg>
+          <div>
+            <b>0% platform take</b>
+            <p>Artisans receive 100%</p>
+          </div>
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+          </svg>
+          <div>
+            <b>Provenance &amp; craft</b>
+            <p>Each piece handmade</p>
+          </div>
+        </div>
+        <div className="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          <div>
+            <b>Certificate included</b>
+            <p>Numbered provenance card</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= DISCOVER COLLECTION ================= */}
+      <section id="discover" style={{ maxWidth: 1200, margin: "40px auto 0", padding: "30px 24px 60px" }}>
+        <div className="discover-head">
+          <div>
+            <span className="serif" style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: "var(--terra)", fontWeight: 700 }}>
+              Curated Catalog
+            </span>
+            <h2 style={{ fontSize: "clamp(26px, 3.2vw, 36px)", marginTop: 4 }}>
+              Handmade pieces ready for your personal touch
+            </h2>
+          </div>
+          <div className="chips">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`chip ${activeCategory === cat ? "active" : ""}`}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="pgrid">
+          {filteredProducts.map((p) => {
+            const artisan = getArtisanById(p.artisanId);
+            const isFav = favorites.includes(p.id);
+
+            return (
+              <article
+                key={p.id}
+                className="pcard"
+                onClick={() => navigate(`/customize?product=${p.id}`)}
+                tabIndex={0}
+                role="button"
+                aria-label={`Customize ${p.name}`}
+              >
+                <div className="thumb">
+                  <span className="vbadge">✓ Verified artisan</span>
+                  <button
+                    className={`fav ${isFav ? "on" : ""}`}
+                    onClick={(e) => handleFavoriteClick(e, p.id)}
+                    aria-label="Save to favorites"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 21C7 16.5 3 13 3 8.9 3 6 5.2 4 7.9 4c1.7 0 3.2.8 4.1 2.2C12.9 4.8 14.4 4 16.1 4 18.8 4 21 6 21 8.9c0 4.1-4 7.6-9 12.1z" />
+                    </svg>
+                  </button>
+
+                  <ProductSVG
+                    type={p.svg}
+                    cfg={{ color: p.colors[0]?.h || "#C05F3C", pattern: "none", text: "" }}
+                  />
+                </div>
+
+                <div className="pinfo">
+                  <span className="cat">{p.cat}</span>
+                  <h3>{p.name}</h3>
+                  <div className="by">
+                    by {artisan?.name} · {artisan?.loc}
+                  </div>
+                  <div className="prow">
+                    <div className="price">
+                      ${p.base}
+                      <small>customizable</small>
+                    </div>
+                    <div className="rate">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3 6.5 7 .9-5 4.8 1.2 7L12 17.8 5.8 21.2 7 14.2 2 9.4l7-.9L12 2z" />
+                      </svg>
+                      {p.rating}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
+      <section id="how" className="how">
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 40px" }}>
+            <span className="serif" style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: "var(--terra)", fontWeight: 700 }}>
+              The KALART Journey
+            </span>
+            <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", marginTop: 6 }}>
+              A respectful bridge between patrons and master makers
+            </h2>
+          </div>
+
+          <div className="hsteps">
+            <div className="hstep">
+              <span className="num">01</span>
+              <h3>Choose or Design</h3>
+              <p>
+                Select from verified artisan collections. Customize colors, patterns, and personal engravings with instant generative AI visual mockups.
+              </p>
+            </div>
+            <div className="hstep">
+              <span className="num">02</span>
+              <h3>Artisan Sign-Off &amp; Crafting</h3>
+              <p>
+                Your design is submitted directly to the maker's studio. They verify feasibility, approve the composition, and begin hand-crafting your piece.
+              </p>
+            </div>
+            <div className="hstep">
+              <span className="num">03</span>
+              <h3>Provenance &amp; Certificate</h3>
+              <p>
+                Every order arrives with a signed physical Certificate of Authenticity containing a unique archival tracking ID and the master's signature seal.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= MEET THE MAKERS ================= */}
+      <section id="artisans" style={{ maxWidth: 1200, margin: "50px auto 70px", padding: "0 24px" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 30, flexWrap: "wrap", gap: 16 }}>
+          <div>
+            <span className="serif" style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: "var(--terra)", fontWeight: 700 }}>
+              Artisan Guild
+            </span>
+            <h2 style={{ fontSize: "clamp(24px, 3vw, 34px)", marginTop: 4 }}>
+              Meet the master makers behind each piece
+            </h2>
+          </div>
+          <Link to="/artisans" className="btn btn-ghost btn-sm">
+            View all 38 workshops →
+          </Link>
+        </div>
+
+        <div className="agrid">
+          {verifiedArtisans.map((artisan) => (
+            <div
+              key={artisan.id}
+              className="acard"
+              onClick={() => toast("info", `${artisan.name}'s master profile and story`)}
+            >
+              <div className="av">
+                <AvatarSVG avatar={artisan.av} />
+              </div>
+              <h3>{artisan.name}</h3>
+              <div className="craft">{artisan.craft}</div>
+              <div className="loc">{artisan.loc} · {artisan.sales} pieces crafted</div>
+              <div className="rate" style={{ justifyContent: "center", marginTop: 8 }}>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3 6.5 7 .9-5 4.8 1.2 7L12 17.8 5.8 21.2 7 14.2 2 9.4l7-.9L12 2z" />
+                </svg>
+                {artisan.rating}
+              </div>
+              <span className="vpill" style={{ marginTop: 12 }}>
+                ✓ Verified master
+              </span>
+            </div>
+          ))}
         </div>
       </section>
     </main>

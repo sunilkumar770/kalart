@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KALART — Handmade. Customized. Verified.</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/fraunces@latest.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/inter@latest.css">
+<style>
+:root{
+  --cream:#FAF5EE; --paper:#FFFDF8; --ink:#2C2119; --ink-soft:#6B5D50;
+  --terra:#C05F3C; --terra-dark:#9A4A2D; --ochre:#D9A441; --sage:#7C8A6E;
+  --indigo:#3E4A61; --gold:#C9A227; --line:#EAE0D2;
+  --radius:18px; --shadow:0 10px 30px rgba(44,33,25,.08);
+  --shadow-lg:0 24px 60px rgba(44,33,25,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;
+  background-image:radial-gradient(rgba(192,95,60,.045) 1px,transparent 1px);background-size:26px 26px}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif}
+button{font-family:inherit;cursor:pointer}
+img{max-width:100%}
+::selection{background:var(--ochre);color:#fff}
+
+/* ---------- HEADER ---------- */
+header{position:sticky;top:0;z-index:90;background:rgba(250,245,238,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.logo svg{width:34px;height:34px}
+.logo b{font-family:'Fraunces',serif;font-size:22px;letter-spacing:.14em;font-weight:700}
+.logo small{display:block;font-size:9px;letter-spacing:.28em;color:var(--ink-soft);text-transform:uppercase;margin-top:-4px}
+nav.mainnav{display:flex;gap:24px;margin-left:12px}
+nav.mainnav a{color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+nav.mainnav a:hover{color:var(--terra)}
+.hspacer{flex:1}
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px;box-shadow:0 2px 8px rgba(44,33,25,.05)}
+.seg button{border:0;background:transparent;padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink-soft);transition:.25s}
+.seg button.active{background:var(--ink);color:#fff}
+.cartbtn{position:relative;border:1px solid var(--line);background:#fff;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:.25s;box-shadow:0 2px 8px rgba(44,33,25,.05)}
+.cartbtn:hover{transform:translateY(-2px);border-color:var(--terra)}
+.cartbtn svg{width:20px;height:20px;stroke:var(--ink)}
+.cartcount{position:absolute;top:-4px;right:-4px;background:var(--terra);color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:999px;display:grid;place-items:center;padding:0 5px;transform:scale(0);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.cartcount.show{transform:scale(1)}
+
+/* ---------- HERO ---------- */
+.hero{max-width:1200px;margin:0 auto;padding:56px 24px 30px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--terra-dark);box-shadow:0 2px 10px rgba(44,33,25,.06)}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:var(--sage);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,138,110,.5)}50%{box-shadow:0 0 0 6px rgba(124,138,110,0)}}
+.hero h1{font-size:clamp(38px,5.2vw,62px);line-height:1.06;font-weight:600;margin:20px 0 16px;letter-spacing:-.01em}
+.hero h1 em{font-style:italic;color:var(--terra)}
+.hero p.lead{color:var(--ink-soft);font-size:17px;max-width:480px;margin-bottom:28px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:14px 30px;font-size:14.5px;font-weight:600;transition:.25s;display:inline-flex;align-items:center;gap:9px}
+.btn-primary{background:var(--terra);color:#fff;box-shadow:0 8px 22px rgba(192,95,60,.35)}
+.btn-primary:hover{background:var(--terra-dark);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink);transform:translateY(-2px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#000;transform:translateY(-2px)}
+.btn-sm{padding:9px 18px;font-size:13px}
+.hero-stats{display:flex;gap:36px;margin-top:38px}
+.hero-stats b{font-family:'Fraunces',serif;font-size:26px;display:block}
+.hero-stats span{font-size:12.5px;color:var(--ink-soft)}
+.hero-art{position:relative;height:480px}
+.arch{position:absolute;inset:0;background:linear-gradient(160deg,#F3E3D0,#EAD9C2 60%,#E3CDB2);border-radius:240px 240px 28px 28px;overflow:hidden}
+.arch .ring{position:absolute;border:1.5px dashed rgba(154,74,45,.3);border-radius:50%}
+.arch .r1{width:340px;height:340px;top:40px;left:50%;transform:translateX(-50%)}
+.arch .r2{width:250px;height:250px;top:85px;left:50%;transform:translateX(-50%)}
+.hero-vase{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:78%;filter:drop-shadow(0 24px 30px rgba(44,33,25,.25));animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-53%)}}
+.float-chip{position:absolute;background:#fff;border-radius:16px;padding:12px 16px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;animation:float 5s ease-in-out infinite}
+.float-chip svg{width:22px;height:22px;flex:none}
+.chip-ai{top:44px;left:-24px;animation-delay:.6s}
+.chip-verify{bottom:80px;right:-18px;animation-delay:1.2s}
+.chip-comm{bottom:8px;left:6px;animation-delay:1.8s}
+
+/* ---------- TRUST BAR ---------- */
+.trust{max-width:1200px;margin:26px auto 0;padding:0 24px}
+.trust-in{background:var(--ink);color:#F5EDE2;border-radius:var(--radius);padding:22px 30px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.trust-in div{display:flex;gap:12px;align-items:center;font-size:13px}
+.trust-in svg{width:26px;height:26px;flex:none;stroke:var(--ochre)}
+.trust-in b{display:block;font-size:13.5px;color:#fff}
+.trust-in span{color:#B9AB9B}
+
+/* ---------- SECTIONS ---------- */
+section{max-width:1200px;margin:0 auto;padding:56px 24px 10px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:600}
+.sec-head p{color:var(--ink-soft);font-size:14.5px;max-width:440px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 20px;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.2s}
+.chip:hover{border-color:var(--terra);color:var(--terra)}
+.chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* ---------- PRODUCT GRID ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(262px,1fr));gap:22px}
+.pcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.3s;position:relative}
+.pcard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:#dcc9b2}
+.pcard .thumb{aspect-ratio:1/0.92;background:linear-gradient(160deg,#F6ECDD,#EFE1CC);display:grid;place-items:center;overflow:hidden;position:relative}
+.pcard .thumb svg.psvg{width:84%;transition:transform .5s}
+.pcard:hover .thumb svg.psvg{transform:scale(1.06) rotate(-1.5deg)}
+.fav{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;z-index:2;transition:.25s}
+.fav:hover{transform:scale(1.12)}
+.fav svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2}
+.fav.on svg{fill:var(--terra);stroke:var(--terra)}
+.vbadge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.94);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--sage);display:flex;gap:5px;align-items:center;z-index:2}
+.pinfo{padding:16px 18px 18px}
+.pinfo .cat{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft);font-weight:700}
+.pinfo h3{font-size:17.5px;font-weight:600;margin:4px 0 2px}
+.pinfo .by{font-size:12.5px;color:var(--ink-soft)}
+.prow{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.price{font-family:'Fraunces',serif;font-size:20px;font-weight:700}
+.price small{font-family:'Inter';font-size:11px;color:var(--ink-soft);font-weight:500;display:block}
+.rate{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:4px}
+.rate svg{width:14px;height:14px;fill:var(--ochre)}
+
+/* ---------- HOW IT WORKS ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;position:relative;transition:.3s}
+.step:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.step .num{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--terra);background:#F7E8DF;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;margin-bottom:14px}
+.step h3{font-size:16.5px;margin-bottom:6px;font-weight:600}
+.step p{font-size:13px;color:var(--ink-soft)}
+
+/* ---------- ARTISAN CARDS ---------- */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
+.acard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;transition:.3s;cursor:pointer}
+.acard:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.acard .av{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;overflow:hidden;border:3px solid #fff;box-shadow:0 6px 18px rgba(44,33,25,.15)}
+.acard h3{font-size:17px;font-weight:600}
+.acard .craft{font-size:12.5px;color:var(--terra);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin:2px 0 6px}
+.acard .loc{font-size:12.5px;color:var(--ink-soft)}
+.vpill{display:inline-flex;align-items:center;gap:5px;background:#EDF2E8;color:#55684A;font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 12px;margin-top:10px}
+.vpill svg{width:13px;height:13px}
+.vpill.pend{background:#FBF0DA;color:#8A6B1D}
+
+/* ---------- PRODUCT DETAIL ---------- */
+#view-product{display:none;max-width:1200px;margin:0 auto;padding:34px 24px 60px}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft);background:none;border:0;margin-bottom:22px;transition:.2s}
+.backlink:hover{color:var(--terra);gap:12px}
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
+.pd-stage{background:linear-gradient(160deg,#F6ECDD,#EDDDC4);border:1px solid var(--line);border-radius:24px;aspect-ratio:1/1;display:grid;place-items:center;position:relative;overflow:hidden}
+.pd-stage svg.psvg{width:82%;transition:opacity .4s}
+.pd-stage.gen svg.psvg{opacity:.25}
+.scanline{position:absolute;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(217,164,65,.35),transparent);top:-130px;pointer-events:none;opacity:0}
+.pd-stage.gen .scanline{opacity:1;animation:scan 1.2s linear infinite}
+@keyframes scan{to{top:110%}}
+.gen-overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(250,245,238,.4);backdrop-filter:blur(1px)}
+.pd-stage.gen .gen-overlay{display:grid}
+.gen-box{background:#fff;border-radius:16px;padding:20px 28px;box-shadow:var(--shadow-lg);text-align:center;width:250px}
+.gen-box .spinner{width:34px;height:34px;border:3.5px solid var(--line);border-top-color:var(--terra);border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-box p{font-size:13px;font-weight:600}
+.gen-box small{font-size:11.5px;color:var(--ink-soft)}
+.thumb-row{display:flex;gap:12px;margin-top:14px}
+.tn{width:74px;height:74px;border-radius:14px;border:2px solid var(--line);background:#F4E9D8;display:grid;place-items:center;cursor:pointer;transition:.2s;overflow:hidden}
+.tn svg{width:80%}
+.tn.active,.tn:hover{border-color:var(--terra)}
+.pd-info h1{font-size:clamp(26px,3vw,36px);font-weight:600;line-height:1.15}
+.pd-by{display:flex;align-items:center;gap:12px;margin:14px 0 6px}
+.pd-by .av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;border:2px solid #fff;box-shadow:0 3px 10px rgba(44,33,25,.18)}
+.pd-by b{font-size:14px}
+.pd-by span{font-size:12.5px;color:var(--ink-soft);display:block}
+.pd-price{font-family:'Fraunces',serif;font-size:32px;font-weight:700;margin:14px 0 4px}
+.pd-price small{font-family:'Inter';font-size:12px;color:var(--sage);font-weight:700;background:#EDF2E8;border-radius:999px;padding:4px 10px;margin-left:8px;vertical-align:middle}
+.opt-block{margin-top:22px}
+.opt-block .lbl{display:flex;justify-content:space-between;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:10px}
+.opt-block .lbl b{color:var(--ink);text-transform:none;letter-spacing:0;font-size:13px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:42px;height:42px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line);cursor:pointer;transition:.2s;position:relative}
+.sw:hover{transform:scale(1.1)}
+.sw.active{box-shadow:0 0 0 2.5px var(--terra)}
+.pbtns,.sbtns{display:flex;gap:10px;flex-wrap:wrap}
+.pbtn,.sbtn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;transition:.2s}
+.pbtn:hover,.sbtn:hover{border-color:var(--terra)}
+.pbtn.active,.sbtn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.engrave-in{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 16px;font-size:14px;font-family:'Fraunces',serif;letter-spacing:.04em;outline:none;transition:.2s}
+.engrave-in:focus{border-color:var(--terra)}
+.ai-bar{margin-top:24px;background:linear-gradient(120deg,#2C2119,#4A3626);border-radius:18px;padding:18px 20px;color:#F5EDE2;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ai-bar .spark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--ochre),var(--terra));display:grid;place-items:center;flex:none}
+.ai-bar .spark svg{width:22px;height:22px;fill:#fff}
+.ai-bar div{flex:1;min-width:160px}
+.ai-bar b{font-size:14px;display:block}
+.ai-bar small{font-size:12px;color:#B9AB9B}
+.ai-gen-btn{background:var(--ochre);color:#2C2119;border:0;border-radius:999px;padding:11px 22px;font-weight:700;font-size:13.5px;transition:.25s}
+.ai-gen-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(217,164,65,.4)}
+.buyrow{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.buyrow .btn{flex:1;justify-content:center;min-width:180px}
+.cert-note{margin-top:20px;border:1.5px dashed var(--ochre);background:#FDF6E7;border-radius:14px;padding:14px 16px;display:flex;gap:12px;font-size:12.5px;color:#7A6220}
+.cert-note svg{width:26px;height:26px;flex:none}
+
+/* ---------- CART DRAWER ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(44,33,25,.45);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.3s;z-index:100}
+.backdrop.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:-460px;width:min(440px,94vw);height:100vh;background:var(--paper);z-index:110;transition:right .38s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(44,33,25,.2)}
+.drawer.open{right:0}
+.dhead{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.dhead h3{font-size:20px;font-weight:600}
+.xbtn{background:#fff;border:1px solid var(--line);width:36px;height:36px;border-radius:50%;font-size:16px;display:grid;place-items:center;transition:.2s}
+.xbtn:hover{background:var(--ink);color:#fff}
+.dbody{flex:1;overflow-y:auto;padding:18px 24px}
+.empty-cart{text-align:center;padding:60px 20px;color:var(--ink-soft)}
+.empty-cart svg{width:70px;height:70px;stroke:var(--line);margin-bottom:14px}
+.citem{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;animation:slideIn .3s}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1}}
+.citem .ci-thumb{width:74px;height:74px;border-radius:10px;background:#F4E9D8;display:grid;place-items:center;flex:none;overflow:hidden}
+.citem .ci-thumb svg{width:86%}
+.ci-info{flex:1;min-width:0}
+.ci-info b{font-size:13.5px;display:block;font-family:'Fraunces',serif}
+.ci-info .cfg{font-size:11.5px;color:var(--ink-soft);margin:3px 0 8px}
+.appr-tag{display:inline-block;font-size:10px;font-weight:700;background:#FBF0DA;color:#8A6B1D;border-radius:999px;padding:2px 9px;margin-left:6px;vertical-align:middle}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:14px;line-height:1}
+.qty span{font-size:13.5px;font-weight:700;min-width:18px;text-align:center}
+.ci-price{font-family:'Fraunces',serif;font-weight:700;font-size:15px;text-align:right}
+.rm{background:none;border:0;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;margin-top:6px;display:block}
+.rm:hover{color:var(--terra)}
+.dfoot{border-top:1px solid var(--line);padding:20px 24px;background:#fff}
+.sumrow{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:8px;color:var(--ink-soft)}
+.sumrow.total{font-size:17px;color:var(--ink);font-weight:700;font-family:'Fraunces',serif;margin:10px 0 4px}
+.commission-note{font-size:11.5px;color:var(--sage);font-weight:600;background:#EDF2E8;border-radius:10px;padding:8px 12px;margin-bottom:14px}
+
+/* ---------- MODAL ---------- */
+.modal{position:fixed;inset:0;z-index:120;display:none;place-items:center;padding:20px}
+.modal.show{display:grid}
+.modal-card{background:var(--paper);border-radius:24px;width:min(560px,100%);max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:pop .35s cubic-bezier(.34,1.4,.64,1);position:relative;z-index:2}
+@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1}}
+.mc-head{padding:24px 28px 0;display:flex;justify-content:space-between;align-items:center}
+.mc-head h3{font-size:22px;font-weight:600}
+.mc-body{padding:20px 28px 28px}
+.field{margin-bottom:14px}
+.field label{font-size:12px;font-weight:700;color:var(--ink-soft);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+.field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;background:#fff;transition:.2s}
+.field input:focus{border-color:var(--terra)}
+.field.err input{border-color:#C0392B}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.success-anim{text-align:center;padding:14px 0 6px}
+.check-circle{width:84px;height:84px;margin:0 auto 18px;border-radius:50%;background:#EDF2E8;display:grid;place-items:center}
+.check-circle svg{width:44px;height:44px;stroke:var(--sage);stroke-width:3;fill:none;stroke-linecap:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .7s .15s forwards ease-out}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cert-card{border:2px solid var(--ochre);background:linear-gradient(150deg,#FDF6E7,#FAEFDA);border-radius:16px;padding:20px;margin-top:16px;position:relative;overflow:hidden}
+.cert-card:before{content:"";position:absolute;inset:8px;border:1px dashed rgba(201,162,39,.5);border-radius:10px;pointer-events:none}
+.cert-card .ct{text-align:center;position:relative}
+.cert-card h4{font-family:'Fraunces',serif;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:#7A6220}
+.cert-card .seal{width:56px;height:56px;margin:10px auto}
+.cert-card p{font-size:12.5px;color:#7A6220}
+.cert-card b{font-family:'Fraunces',serif;font-size:15px}
+
+/* ---------- DASHBOARDS ---------- */
+.dash{max-width:1200px;margin:0 auto;padding:40px 24px 70px;display:none}
+.dash-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.dash-head h1{font-size:clamp(26px,3.4vw,36px);font-weight:600}
+.dash-head p{color:var(--ink-soft);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:34px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.stat .si{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px}
+.stat .si svg{width:22px;height:22px}
+.stat b{font-family:'Fraunces',serif;font-size:26px;display:block}
+.stat span{font-size:12.5px;color:var(--ink-soft)}
+.stat .up{color:var(--sage);font-size:11.5px;font-weight:700}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;margin-bottom:24px}
+.panel h3{font-size:18px;font-weight:600;margin-bottom:4px}
+.panel .sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);padding:10px 12px;border-bottom:1.5px solid var(--line)}
+td{padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.status{font-size:11px;font-weight:700;border-radius:999px;padding:4px 12px;display:inline-block}
+.st-wait{background:#FBF0DA;color:#8A6B1D}
+.st-ok{background:#EDF2E8;color:#55684A}
+.st-ship{background:#E4EAF2;color:#3E4A61}
+.toggle{width:44px;height:24px;border-radius:999px;background:#D8CCBB;border:0;position:relative;transition:.25s;flex:none}
+.toggle:after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.toggle.on{background:var(--sage)}
+.toggle.on:after{left:23px}
+.design-card{display:flex;gap:16px;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;background:#fff;align-items:center;flex-wrap:wrap}
+.design-card .dc-prev{width:96px;height:96px;border-radius:12px;background:#F4E9D8;display:grid;place-items:center;flex:none;overflow:hidden}
+.design-card .dc-prev svg{width:88%}
+.dc-info{flex:1;min-width:170px}
+.dc-info b{font-size:14.5px;font-family:'Fraunces',serif}
+.dc-info p{font-size:12.5px;color:var(--ink-soft);margin:3px 0}
+.dc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-ok{background:var(--sage);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:700;transition:.2s}
+.btn-ok:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-no{background:#fff;color:#C0392B;border:1.5px solid #EBC9C2;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:700;transition:.2s}
+.btn-no:hover{background:#FBEFEC}
+.verify-card{display:flex;gap:18px;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;background:#fff;align-items:center;flex-wrap:wrap}
+.verify-card .av{width:70px;height:70px;border-radius:50%;overflow:hidden;flex:none;border:2px solid #fff;box-shadow:0 4px 12px rgba(44,33,25,.15)}
+.docs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.doc-tag{font-size:10.5px;font-weight:700;background:#F1EAE0;color:var(--ink-soft);border-radius:999px;padding:3px 10px}
+.empty-state{text-align:center;padding:34px;color:var(--ink-soft);font-size:13.5px}
+
+/* ---------- FOOTER ---------- */
+footer{background:var(--ink);color:#B9AB9B;margin-top:70px}
+.fwrap{max-width:1200px;margin:0 auto;padding:56px 24px 30px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px}
+footer .logo b,footer .logo small{color:#fff}
+footer p{font-size:13px;margin-top:12px;max-width:280px}
+footer h4{color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;font-family:'Inter';font-weight:700}
+footer a{display:block;color:#B9AB9B;text-decoration:none;font-size:13.5px;margin-bottom:9px;transition:.2s}
+footer a:hover{color:var(--ochre)}
+.fbot{border-top:1px solid #42342A;max-width:1200px;margin:0 auto;padding:18px 24px;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* ---------- TOAST ---------- */
+.toasts{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--ink);color:#fff;border-radius:14px;padding:14px 20px;font-size:13.5px;font-weight:500;box-shadow:var(--shadow-lg);display:flex;gap:10px;align-items:center;animation:toastIn .35s cubic-bezier(.34,1.4,.64,1);max-width:340px}
+.toast svg{width:18px;height:18px;flex:none;stroke:var(--ochre)}
+.toast.out{animation:toastOut .3s forwards}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1}}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+
+@media(max-width:960px){
+  .hero{grid-template-columns:1fr;padding-top:34px}
+  .hero-art{height:400px;max-width:460px;margin:0 auto;width:100%}
+  .trust-in{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .pd-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .fwrap{grid-template-columns:1fr 1fr}
+  nav.mainnav{display:none}
+}
+@media(max-width:600px){
+  .trust-in,.steps,.stats,.f2{grid-template-columns:1fr}
+  .seg button{padding:6px 10px;font-size:11px}
+  .hwrap{gap:12px;padding:12px 16px}
+  .logo b{font-size:18px}
+  .chip-ai{left:0}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div class="logo" onclick="goCustomer(true)">
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#C05F3C"/><path d="M20 7c-5 4-8 8.5-8 13.5a8 8 0 0016 0C28 15.5 25 11 20 7z" fill="#FAF5EE"/><circle cx="20" cy="21" r="3.2" fill="#D9A441"/></svg>
+      <span><b>KALART</b><small>Handmade · Custom · Verified</small></span>
+    </div>
+    <nav class="mainnav">
+      <a href="#discover" onclick="goCustomer()">Discover</a>
+      <a href="#artisans" onclick="goCustomer()">Artisans</a>
+      <a href="#how" onclick="goCustomer()">How it works</a>
+    </nav>
+    <div class="hspacer"></div>
+    <div class="seg" id="modeSeg">
+      <button class="active" data-mode="customer" onclick="setMode('customer')">🛍 Customer</button>
+      <button data-mode="artisan" onclick="setMode('artisan')">🧵 Artisan</button>
+      <button data-mode="admin" onclick="setMode('admin')">🛡 Admin</button>
+    </div>
+    <button class="cartbtn" onclick="openCart()" aria-label="Cart">
+      <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 7h12l-1.2 12.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 7z"/><path d="M9 10V6a3 3 0 016 0v4"/></svg>
+      <span class="cartcount" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- ================= CUSTOMER APP ================= -->
+<main id="view-customer">
+  <div class="hero">
+    <div>
+      <span class="badge"><span class="dot"></span> 0% commission — artisans keep every cent</span>
+      <h1>Handmade treasures,<em> designed by you</em>, crafted by verified artisans.</h1>
+      <p class="lead">KALART connects you directly with master artisans. Customize any piece with AI-generated mockups, approve the design, and receive it with a certificate of authenticity.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="scrollTo2('discover')">Explore the collection →</button>
+        <button class="btn btn-ghost" onclick="setMode('artisan')">Become an artisan</button>
+      </div>
+      <div class="hero-stats">
+        <div><b>240+</b><span>Verified artisans</span></div>
+        <div><b>18k</b><span>Unique pieces delivered</span></div>
+        <div><b>4.9★</b><span>Average rating</span></div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="arch">
+        <div class="ring r1"></div><div class="ring r2"></div>
+        <div class="hero-vase" id="heroVase"></div>
+      </div>
+      <div class="float-chip chip-ai">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" fill="#D9A441"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" fill="#C05F3C"/></svg>
+        AI mockups in seconds
+      </div>
+      <div class="float-chip chip-verify">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3.5v5c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11v-5L12 2z" fill="#EDF2E8" stroke="#7C8A6E" stroke-width="1.6"/><path d="M8.5 12l2.4 2.4 4.6-4.8" stroke="#55684A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Verified artisans only
+      </div>
+      <div class="float-chip chip-comm">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#FBEFEC" stroke="#C05F3C" stroke-width="1.6"/><path d="M8 12.5l2.6 2.5L16 9.5" stroke="#C05F3C" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        100% goes to the maker
+      </div>
+    </div>
+  </div>
+
+  <div class="trust">
+    <div class="trust-in">
+      <div><svg fill="none" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 2l8 3.5v5c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11v-5L12 2z"/><path d="M8.5 12l2.4 2.4 4.6-4.8"/></svg><span><b>Artisan verification</b><span>ID + portfolio review</span></span></div>
+      <div><svg fill="none" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/></svg><span><b>AI customization</b><span>Live mockups & previews</span></span></div>
+      <div><svg fill="none" stroke-width="1.7" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span><b>Authenticity certificate</b><span>With every order</span></span></div>
+      <div><svg fill="none" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span><b>Zero commission</b><span>Artisans keep 100%</span></span></div>
+    </div>
+  </div>
+
+  <section id="discover">
+    <div class="sec-head">
+      <div><h2>Discover the collection</h2><p>Every piece is made to order by hand. Customize colors, patterns and engravings — preview instantly with AI.</p></div>
+    </div>
+    <div class="chips" id="catChips"></div>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <section id="how">
+    <div class="sec-head"><div><h2>How KALART works</h2><p>From inspiration to your doorstep, in four steps.</p></div></div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Choose & customize</h3><p>Pick a handmade piece, select colors, patterns and engravings. Our AI renders a live mockup of your exact design.</p></div>
+      <div class="step"><div class="num">2</div><h3>Artisan approval</h3><p>The artisan reviews your custom design, confirms feasibility and the production timeline before crafting begins.</p></div>
+      <div class="step"><div class="num">3</div><h3>Handcrafted for you</h3><p>Your piece is made by hand. Track production and delivery status in real time from your order page.</p></div>
+      <div class="step"><div class="num">4</div><h3>Certified delivery</h3><p>Receive your creation with a signed certificate of authenticity — and know 100% of the price went to the maker.</p></div>
+    </div>
+  </section>
+
+  <section id="artisans">
+    <div class="sec-head"><div><h2>Meet the makers</h2><p>Verified master artisans from around the world. No middlemen, no commission.</p></div></div>
+    <div class="agrid" id="artisanGrid"></div>
+  </section>
+</main>
+
+<!-- ================= PRODUCT DETAIL ================= -->
+<div id="view-product">
+  <button class="backlink" onclick="goCustomer()">← Back to collection</button>
+  <div class="pd-grid">
+    <div>
+      <div class="pd-stage" id="pdStage">
+        <div id="pdPreview"></div>
+        <div class="scanline"></div>
+        <div class="gen-overlay"><div class="gen-box"><div class="spinner"></div><p id="genStatus">Generating AI mockup…</p><small id="genSub">Analyzing artisan style</small></div></div>
+      </div>
+      <div class="thumb-row" id="pdThumbs"></div>
+    </div>
+    <div class="pd-info" id="pdInfo"></div>
+  </div>
+</div>
+
+<!-- ================= ARTISAN APP ================= -->
+<div class="dash" id="view-artisan">
+  <div class="dash-head">
+    <div><h1>Artisan Studio</h1><p>Welcome back, Meera · <span style="color:var(--sage);font-weight:700">✓ Verified artisan</span> · Jaipur, India</p></div>
+    <button class="btn btn-dark btn-sm" onclick="toast('New product draft created')">+ Add product</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="si" style="background:#EDF2E8"><svg fill="none" stroke="#55684A" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3v18M7 7c0-2 2-3 5-3s5 1 5 3-2 3-5 3-5 1-5 3 2 3 5 3 5-1 5-3"/></svg></div><b>$3,248</b><span>Revenue this month</span><span class="up">▲ 18% · 0% commission taken</span></div>
+    <div class="stat"><div class="si" style="background:#F7E8DF"><svg fill="none" stroke="#9A4A2D" stroke-width="1.8" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 6V4h8v2M4 11h16"/></svg></div><b>12</b><span>Orders in production</span><span class="up">▲ 3 new this week</span></div>
+    <div class="stat"><div class="si" style="background:#FBF0DA"><svg fill="none" stroke="#8A6B1D" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/></svg></div><b id="statPending">3</b><span>Designs awaiting approval</span></div>
+    <div class="stat"><div class="si" style="background:#E4EAF2"><svg fill="none" stroke="#3E4A61" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 17.5l4.5 2.5-1-5 3.5-3.5-5-.7L12 6l-2 4.8-5 .7 3.5 3.5-1 5 4.5-2.5z"/></svg></div><b>4.9</b><span>Rating · 128 reviews</span></div>
+  </div>
+
+  <div class="panel">
+    <h3>Custom design approvals</h3>
+    <p class="sub">Customers configured these pieces with the AI customizer. Approve to begin production, or decline with a note.</p>
+    <div id="designQueue"></div>
+  </div>
+
+  <div class="panel">
+    <h3>My products</h3>
+    <p class="sub">Toggle listings on or off. Photography and customization options are managed per product.</p>
+    <div id="artisanProducts"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Recent orders</h3>
+    <p class="sub">Confirmed orders ready for production and fulfilment.</p>
+    <table id="artisanOrders">
+      <thead><tr><th>Order</th><th>Piece</th><th>Customer</th><th>Total (yours)</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>#KA-2291</td><td>Terra Organic Vase · M · Waves</td><td>Amelie F.</td><td>$92.00</td><td><span class="status st-ship">Shipping</span></td></tr>
+        <tr><td>#KA-2288</td><td>Hearth Candle Set · Engraved</td><td>Jonas W.</td><td>$48.00</td><td><span class="status st-ok">Delivered</span></td></tr>
+        <tr><td>#KA-2280</td><td>Terra Organic Vase · L · Dots</td><td>Priya S.</td><td>$104.00</td><td><span class="status st-ok">Delivered</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= ADMIN APP ================= -->
+<div class="dash" id="view-admin">
+  <div class="dash-head">
+    <div><h1>Administration</h1><p>Platform trust & safety · Verification, listings and disputes</p></div>
+    <span class="badge" style="background:var(--ink);color:#fff;border-color:var(--ink)">🛡 Admin session</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="si" style="background:#FBF0DA"><svg fill="none" stroke="#8A6B1D" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5"/><path d="M17 8.5l1.8 1.8 3.2-3.4"/></svg></div><b id="statQueue">2</b><span>Verification requests</span></div>
+    <div class="stat"><div class="si" style="background:#EDF2E8"><svg fill="none" stroke="#55684A" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2l8 3.5v5c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11v-5L12 2z"/></svg></div><b>240</b><span>Verified artisans</span></div>
+    <div class="stat"><div class="si" style="background:#E4EAF2"><svg fill="none" stroke="#3E4A61" stroke-width="1.8" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg></div><b>1,284</b><span>Active listings</span></div>
+    <div class="stat"><div class="si" style="background:#FBEFEC"><svg fill="none" stroke="#C0392B" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19L12 3z"/><path d="M12 10v4M12 17.2v.1"/></svg></div><b>1</b><span>Open disputes</span></div>
+  </div>
+
+  <div class="panel">
+    <h3>Artisan verification queue</h3>
+    <p class="sub">Review identity documents, workshop evidence and portfolio before granting the verified badge.</p>
+    <div id="verifyQueue"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Listing review</h3>
+    <p class="sub">New product listings requiring authenticity evidence check.</p>
+    <table>
+      <thead><tr><th>Listing</th><th>Artisan</th><th>Evidence</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>Indigo Loom Throw — new colorway</td><td>Tomás Rivera</td><td><span class="doc-tag">📷 6 photos</span> <span class="doc-tag">🎥 Loom video</span></td><td><button class="btn-ok" onclick="this.closest('tr').style.opacity=.45;this.textContent='Approved';toast('Listing approved')">Approve</button></td></tr>
+        <tr><td>Hammered Sun Earrings — gift set</td><td>Aiko Tanaka</td><td><span class="doc-tag">📷 8 photos</span> <span class="doc-tag">🧾 Materials</span></td><td><button class="btn-ok" onclick="this.closest('tr').style.opacity=.45;this.textContent='Approved';toast('Listing approved')">Approve</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3>Open disputes</h3>
+    <p class="sub">Mediation between customers and artisans.</p>
+    <div class="design-card">
+      <div class="dc-info"><b>#D-0117 · Delivery delay</b><p>Order #KA-2244 — customer reports 9 days past estimated delivery. Artisan cites kiln repair. Resolution: refund shipping + 10% credit proposed.</p></div>
+      <div class="dc-actions"><button class="btn-ok" onclick="this.closest('.design-card').remove();toast('Dispute resolved — credit issued')">Resolve</button><button class="btn-no" onclick="toast('Escalated to senior mediator')">Escalate</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CART DRAWER ================= -->
+<div class="backdrop" id="backdrop" onclick="closeCart()"></div>
+<aside class="drawer" id="cartDrawer">
+  <div class="dhead"><h3>Your basket</h3><button class="xbtn" onclick="closeCart()">✕</button></div>
+  <div class="dbody" id="cartBody"></div>
+  <div class="dfoot" id="cartFoot" style="display:none">
+    <div class="sumrow"><span>Subtotal</span><span id="sumSub">$0</span></div>
+    <div class="sumrow"><span>Platform commission</span><span style="color:var(--sage);font-weight:700">$0.00 ✓</span></div>
+    <div class="sumrow total"><span>Total</span><span id="sumTotal">$0</span></div>
+    <div class="commission-note">🌿 100% of this total goes directly to the artisans.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openCheckout()">Checkout →</button>
+  </div>
+</aside>
+
+<!-- ================= CHECKOUT MODAL ================= -->
+<div class="modal" id="modal">
+  <div class="backdrop show" style="position:absolute" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <div class="mc-head"><h3 id="mcTitle">Checkout</h3><button class="xbtn" onclick="closeModal()">✕</button></div>
+    <div class="mc-body" id="mcBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<footer>
+  <div class="fwrap">
+    <div>
+      <div class="logo"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#C05F3C"/><path d="M20 7c-5 4-8 8.5-8 13.5a8 8 0 0016 0C28 15.5 25 11 20 7z" fill="#FAF5EE"/><circle cx="20" cy="21" r="3.2" fill="#D9A441"/></svg><span><b>KALART</b><small>Handmade · Custom · Verified</small></span></div>
+      <p>The zero-commission marketplace where verified artisans craft customizable handmade treasures — each delivered with a certificate of authenticity.</p>
+    </div>
+    <div><h4>Marketplace</h4><a href="#discover" onclick="goCustomer()">All crafts</a><a href="#artisans" onclick="goCustomer()">Artisans</a><a href="#how" onclick="goCustomer()">How it works</a><a href="javascript:void(0)" onclick="toast('Gift cards coming soon')">Gift cards</a></div>
+    <div><h4>For artisans</h4><a href="javascript:void(0)" onclick="setMode('artisan')">Artisan studio</a><a href="javascript:void(0)" onclick="setMode('admin')">Verification</a><a href="javascript:void(0)" onclick="toast('Payouts: weekly, 0% fee')">Payouts</a><a href="javascript:void(0)" onclick="toast('Handbook PDF coming soon')">Handbook</a></div>
+    <div><h4>Company</h4><a href="javascript:void(0)" onclick="toast('Our story: founded 2026')">About</a><a href="javascript:void(0)" onclick="toast('Trust & safety policy')">Trust & safety</a><a href="javascript:void(0)" onclick="toast('Support: hello@kalaart.example')">Contact</a></div>
+  </div>
+  <div class="fbot"><span>© 2026 KALART. Built from the technical blueprint — customer, artisan & admin apps on one platform.</span><span>Privacy · Terms · Cookies</span></div>
+</footer>
+
+<script>
+/* =========================================================
+   KALART — front-end prototype (Customer / Artisan / Admin)
+   ========================================================= */
+let UID = 0;
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const money = n => '$' + n.toFixed(2);
+function shade(hex, amt){
+  let c = hex.replace('#',''); let num = parseInt(c,16);
+  let r = Math.min(255,Math.max(0,(num>>16)+amt)), g = Math.min(255,Math.max(0,((num>>8)&0xff)+amt)), b = Math.min(255,Math.max(0,(num&0xff)+amt));
+  return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+}
+
+/* ---------- ARTISANS ---------- */
+const ARTISANS = [
+  {id:'a1', name:'Meera Kapoor', craft:'Ceramics', loc:'Jaipur, India', verified:true, rating:4.9, sales:1240, bio:'Third-generation potter working with local terracotta clay and ash glazes.', av:{bg:'#F3DFC9',skin:'#C68863',hair:'#2B1B12',shirt:'#7C8A6E',style:'bun'}},
+  {id:'a2', name:'Tomás Rivera', craft:'Textiles', loc:'Oaxaca, Mexico', verified:true, rating:4.8, sales:860, bio:'Backstrap-loom weaver using natural indigo and cochineal dyes.', av:{bg:'#E3E7EE',skin:'#B57B52',hair:'#1F1611',shirt:'#3E4A61',style:'short'}},
+  {id:'a3', name:'Aiko Tanaka', craft:'Jewelry', loc:'Kyoto, Japan', verified:true, rating:5.0, sales:2110, bio:'Metalsmith blending traditional mokumegane with modern minimal forms.', av:{bg:'#F6E2E0',skin:'#E8C3A0',hair:'#221A16',shirt:'#C05F3C',style:'long'}},
+  {id:'a4', name:'Kwame Mensah', craft:'Woodwork', loc:'Accra, Ghana', verified:true, rating:4.9, sales:640, bio:'Carves sustainably sourced walnut and sese wood into functional sculpture.', av:{bg:'#E9EEDF',skin:'#7A4A2B',hair:'#14100C',shirt:'#D9A441',style:'short'}},
+  {id:'a5', name:'Sofia Marchetti', craft:'Leather', loc:'Florence, Italy', verified:true, rating:4.7, sales:930, bio:'Vegetable-tanned leather goods, hand-stitched in the Tuscan tradition.', av:{bg:'#F0E4D2',skin:'#D9A87C',hair:'#5A3825',shirt:'#9A4A2D',style:'long'}},
+  {id:'q1', name:'Sarah Miller', craft:'Leather', loc:'Bristol, UK', verified:false, rating:0, sales:0, bio:'Applicant — 8 years saddlery experience, portfolio of 24 pieces.', av:{bg:'#EDE6F0',skin:'#E5B993',hair:'#8A5A2B',shirt:'#6B5D8F',style:'long'}},
+  {id:'q2', name:'Kofi Asare', craft:'Beadwork', loc:'Kumasi, Ghana', verified:false, rating:0, sales:0, bio:'Applicant — recycled glass bead maker, family workshop since 1988.', av:{bg:'#E4EEE9',skin:'#6F4526',hair:'#100C08',shirt:'#3F7A5E',style:'short'}}
+];
+const A = id => ARTISANS.find(a=>a.id===id);
+
+/* ---------- PRODUCTS ---------- */
+const PRODUCTS = [
+  {id:'p1', svg:'vase', name:'Terra Organic Vase', artisanId:'a1', cat:'Ceramics', base:68, rating:4.9, reviews:128, lead:'7–10 days',
+   desc:'Wheel-thrown terracotta vase with a soft organic silhouette and matte ash glaze. Each piece carries subtle variations — the mark of a human hand.',
+   colors:[{n:'Terracotta',h:'#C05F3C'},{n:'Sand',h:'#D8B98A'},{n:'Sage',h:'#7C8A6E'},{n:'Charcoal',h:'#4A443E'},{n:'Indigo',h:'#3E4A61'}],
+   patterns:['none','dots','stripes','waves'], sizes:[{l:'S · 18cm',add:0},{l:'M · 24cm',add:14},{l:'L · 32cm',add:28}], engrave:true},
+  {id:'p2', svg:'blanket', name:'Indigo Loom Throw', artisanId:'a2', cat:'Textiles', base:95, rating:4.8, reviews:96, lead:'10–14 days',
+   desc:'Handwoven on a backstrap loom from naturally dyed wool. Stripes are laid in by hand, so no two throws are identical.',
+   colors:[{n:'Indigo',h:'#3E4A61'},{n:'Ochre',h:'#D9A441'},{n:'Moss',h:'#6E7A55'},{n:'Rust',h:'#A9532F'}],
+   patterns:['none','stripes','waves'], sizes:[{l:'Throw · 130×180',add:0},{l:'Large · 160×220',add:32}], engrave:true},
+  {id:'p3', svg:'earrings', name:'Hammered Sun Earrings', artisanId:'a3', cat:'Jewelry', base:54, rating:5.0, reviews:212, lead:'5–7 days',
+   desc:'Hand-hammered discs that catch the light with every movement. Hypoallergenic hooks, featherlight wear.',
+   colors:[{n:'Brass',h:'#C9A227'},{n:'Copper',h:'#B06A3B'},{n:'Silver',h:'#A8ADB5'},{n:'Rose',h:'#C98A72'}],
+   patterns:['none','dots','waves'], sizes:[{l:'28mm',add:0},{l:'38mm',add:8}], engrave:false},
+  {id:'p4', svg:'bowl', name:'Walnut Grain Bowl', artisanId:'a4', cat:'Woodwork', base:76, rating:4.9, reviews:74, lead:'8–12 days',
+   desc:'Carved from a single block of sustainably harvested walnut, finished with food-safe oil that deepens with age.',
+   colors:[{n:'Walnut',h:'#6B4429'},{n:'Honey',h:'#B98A4E'},{n:'Ebony',h:'#3A2C22'},{n:'Ash',h:'#C8B496'}],
+   patterns:['none','waves','stripes'], sizes:[{l:'Ø 22cm',add:0},{l:'Ø 28cm',add:18}], engrave:true},
+  {id:'p5', svg:'bag', name:'Nomad Leather Satchel', artisanId:'a5', cat:'Leather', base:148, rating:4.7, reviews:158, lead:'12–16 days',
+   desc:'Vegetable-tanned leather, saddle-stitched by hand with waxed linen thread. Patinas beautifully over years of use.',
+   colors:[{n:'Tan',h:'#B5793F'},{n:'Chestnut',h:'#7A4A2B'},{n:'Black',h:'#3B342E'},{n:'Olive',h:'#6B6A45'}],
+   patterns:['none','dots'], sizes:[{l:'Standard',add:0},{l:'XL',add:36}], engrave:true},
+  {id:'p6', svg:'candle', name:'Hearth Candle Set', artisanId:'a1', cat:'Ceramics', base:42, rating:4.8, reviews:63, lead:'4–6 days',
+   desc:'Two hand-poured beeswax pillars in a hand-glazed ceramic vessel, with wild lavender from the artisan\'s garden.',
+   colors:[{n:'Cream',h:'#EAD9B8'},{n:'Clay',h:'#C05F3C'},{n:'Sage',h:'#7C8A6E'},{n:'Night',h:'#3E4A61'}],
+   patterns:['none','dots','waves'], sizes:[{l:'Set of 2',add:0},{l:'Set of 3',add:16}], engrave:true}
+];
+
+/* ---------- SVG ARTWORK ENGINE ---------- */
+function patternDef(pid, pat, ink){
+  if(pat==='dots') return `<pattern id="${pid}" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="3.2" fill="${ink}" opacity=".5"/><circle cx="20" cy="20" r="3.2" fill="${ink}" opacity=".5"/></pattern>`;
+  if(pat==='stripes') return `<pattern id="${pid}" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect x="0" y="0" width="10" height="24" fill="${ink}" opacity=".45"/></pattern>`;
+  if(pat==='waves') return `<pattern id="${pid}" width="44" height="20" patternUnits="userSpaceOnUse"><path d="M0 12 Q11 0 22 12 T44 12" fill="none" stroke="${ink}" stroke-width="4.5" opacity=".45" stroke-linecap="round"/></pattern>`;
+  return '';
+}
+const VASE_BODY = 'M200,54 C232,54 247,67 249,86 C252,118 240,142 252,180 C268,228 277,264 268,302 C258,339 232,354 200,354 C168,354 142,339 132,302 C123,264 132,228 148,180 C160,142 148,118 151,86 C153,67 168,54 200,54 Z';
+
+function productSVG(type, cfg){
+  const id = ++UID;
+  const c = cfg.color, dark = shade(c,-42), ink = shade(c,-80), light = shade(c,26);
+  const pid='pt'+id, cl='cl'+id, gr='gr'+id;
+  const pat = patternDef(pid, cfg.pattern, ink);
+  const txt = cfg.text ? `<text x="200" y="${cfg.textY||268}" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="${cfg.textSize||19}" fill="${ink}" opacity=".85" letter-spacing="1">${esc(cfg.text.slice(0,18))}</text>` : '';
+  const defs = `<defs>${pat}<clipPath id="${cl}"><path d="${cfg.clip||VASE_BODY}"/></clipPath><linearGradient id="${gr}" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="${light}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${dark}"/></linearGradient></defs>`;
+  let body = '';
+  if(type==='vase'){
+    body = `<ellipse cx="200" cy="357" rx="98" ry="13" fill="#00000012"/>
+      <path d="${VASE_BODY}" fill="url(#${gr})"/>
+      <g clip-path="url(#${cl})">${cfg.pattern!=='none'?`<rect x="0" y="0" width="400" height="400" fill="url(#${pid})"/>`:''}
+      <path d="M160,80 C150,140 148,240 158,330 C150,320 140,290 138,240 C134,170 142,110 160,80 Z" fill="#fff" opacity=".16"/></g>
+      <ellipse cx="200" cy="58" rx="50" ry="12" fill="${dark}"/><ellipse cx="200" cy="58" rx="38" ry="8" fill="${ink}" opacity=".7"/>
+      <g clip-path="url(#${cl})">${txt}</g>`;
+  }
+  if(type==='blanket'){
+    body = `<ellipse cx="200" cy="340" rx="130" ry="12" fill="#00000012"/>
+      <rect x="72" y="230" width="256" height="98" rx="20" fill="${dark}"/>
+      <rect x="86" y="130" width="228" height="118" rx="20" fill="url(#${gr})"/>
+      <clipPath id="${cl}b"><rect x="86" y="130" width="228" height="118" rx="20"/></clipPath>
+      <g clip-path="url(#${cl}b)">${cfg.pattern!=='none'?`<rect x="86" y="130" width="228" height="118" fill="url(#${pid})"/>`:`<rect x="86" y="160" width="228" height="16" fill="${ink}" opacity=".35"/><rect x="86" y="196" width="228" height="10" fill="${ink}" opacity=".25"/>`}
+      <rect x="86" y="130" width="228" height="26" fill="#fff" opacity=".14"/></g>
+      <path d="M92 248 q108 26 216 0" fill="none" stroke="${ink}" stroke-width="3" opacity=".4"/>
+      <g stroke="${light}" stroke-width="4" stroke-linecap="round" opacity=".8">${Array.from({length:9},(_,i)=>`<line x1="${92+i*27}" y1="328" x2="${92+i*27}" y2="344"/>`).join('')}</g>
+      ${cfg.text?`<rect x="164" y="176" width="72" height="44" rx="8" fill="#F6EEDF" opacity=".92"/><text x="200" y="205" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="20" fill="${ink}">${esc(cfg.text.slice(0,4))}</text>`:''}`;
+  }
+  if(type==='earrings'){
+    const hook = (x)=>`<path d="M${x},84 c16,2 22,14 18,28 c-3,11 -12,17 -18,22" fill="none" stroke="${dark}" stroke-width="6" stroke-linecap="round"/><circle cx="${x}" cy="82" r="7" fill="none" stroke="${dark}" stroke-width="5"/>`;
+    const disc = (x)=>`<circle cx="${x}" cy="212" r="62" fill="url(#${gr})"/>
+      <circle cx="${x}" cy="212" r="62" fill="none" stroke="${dark}" stroke-width="3"/>
+      <circle cx="${x-18}" cy="192" r="7" fill="#fff" opacity=".3"/><circle cx="${x+16}" cy="228" r="5" fill="${dark}" opacity=".25"/><circle cx="${x+8}" cy="184" r="4" fill="${dark}" opacity=".2"/><circle cx="${x-20}" cy="234" r="6" fill="${dark}" opacity=".2"/>
+      ${cfg.pattern==='dots'?`<circle cx="${x}" cy="212" r="40" fill="url(#${pid})"/>`:''}${cfg.pattern==='waves'?`<path d="M${x-44},212 q11,-14 22,0 t22,0 t22,0" fill="none" stroke="${ink}" stroke-width="6" opacity=".5" stroke-linecap="round"/>`:''}
+      <line x1="${x}" y1="134" x2="${x}" y2="150" stroke="${dark}" stroke-width="6" stroke-linecap="round"/>`;
+    body = `<ellipse cx="200" cy="330" rx="120" ry="12" fill="#00000010"/>
+      ${hook(132)}${hook(268)}${disc(132)}${disc(268)}
+      <defs>${pat}<linearGradient id="${gr}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset=".5" stop-color="${c}"/><stop offset="1" stop-color="${dark}"/></linearGradient></defs>`;
+  }
+  if(type==='bowl'){
+    const BOWL='M82,186 C88,268 138,316 200,316 C262,316 312,268 318,186 Z';
+    body = `<ellipse cx="200" cy="330" rx="110" ry="12" fill="#00000012"/>
+      <clipPath id="${cl}b"><path d="${BOWL}"/></clipPath>
+      <path d="${BOWL}" fill="url(#${gr})"/>
+      <g clip-path="url(#${cl}b)">
+        ${cfg.pattern!=='none'?`<rect x="60" y="170" width="280" height="160" fill="url(#${pid})"/>`:''}
+        <path d="M96,214 Q200,258 304,214" fill="none" stroke="${ink}" stroke-width="3" opacity=".35"/>
+        <path d="M104,246 Q200,286 296,246" fill="none" stroke="${ink}" stroke-width="3" opacity=".28"/>
+        <path d="M120,278 Q200,308 280,278" fill="none" stroke="${ink}" stroke-width="3" opacity=".2"/>
+        <path d="M110,190 C114,250 150,300 190,310 C150,304 116,262 110,190 Z" fill="#fff" opacity=".12"/>
+        ${txt.replace(/y="\d+"/,'y="252"')}
+      </g>
+      <ellipse cx="200" cy="186" rx="118" ry="30" fill="${light}"/>
+      <ellipse cx="200" cy="188" rx="100" ry="22" fill="${dark}"/>
+      <ellipse cx="200" cy="192" rx="86" ry="16" fill="${ink}" opacity=".55"/>`;
+  }
+  if(type==='bag'){
+    body = `<ellipse cx="200" cy="336" rx="115" ry="12" fill="#00000012"/>
+      <path d="M148,152 C148,74 252,74 252,152" fill="none" stroke="${dark}" stroke-width="13" stroke-linecap="round"/>
+      <rect x="92" y="148" width="216" height="172" rx="22" fill="url(#${gr})"/>
+      <clipPath id="${cl}b"><rect x="92" y="148" width="216" height="172" rx="22"/></clipPath>
+      <g clip-path="url(#${cl}b)">${cfg.pattern!=='none'?`<rect x="92" y="148" width="216" height="172" fill="url(#${pid})"/>`:''}<rect x="92" y="148" width="34" height="172" fill="#fff" opacity=".12"/></g>
+      <rect x="98" y="154" width="204" height="160" rx="18" fill="none" stroke="${ink}" stroke-width="2" stroke-dasharray="7 6" opacity=".5"/>
+      <path d="M92,170 q0,-22 22,-22 h172 q22,0 22,22 v44 q-108,42 -216,0 z" fill="${dark}"/>
+      <rect x="186" y="212" width="28" height="22" rx="5" fill="none" stroke="#C9A227" stroke-width="4"/><line x1="200" y1="214" x2="200" y2="228" stroke="#C9A227" stroke-width="3"/>
+      ${cfg.text?`<text x="200" y="284" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="20" fill="${ink}" opacity=".8" letter-spacing="2">${esc(cfg.text.slice(0,10))}</text>`:''}`;
+  }
+  if(type==='candle'){
+    const flame=(x,y,s)=>`<ellipse cx="${x}" cy="${y-6*s}" rx="${10*s}" ry="${10*s}" fill="#D9A441" opacity=".22"/><path d="M${x},${y-26*s} q${9*s},${12*s} 0,${22*s} q${-9*s},-10*s 0,-${22*s}z" fill="#E8A33D"/><path d="M${x},${y-18*s} q${4.5*s},${8*s} 0,${14*s} q${-4.5*s},-6*s 0,-${14*s}z" fill="#F5D26B"/>`;
+    body = `<ellipse cx="200" cy="342" rx="120" ry="12" fill="#00000012"/>
+      <rect x="112" y="150" width="62" height="180" rx="10" fill="#F1E4C8"/><rect x="112" y="150" width="16" height="180" rx="8" fill="#fff" opacity=".4"/>
+      <line x1="143" y1="150" x2="143" y2="138" stroke="#4A3B2A" stroke-width="3.5" stroke-linecap="round"/>${flame(143,136,1)}
+      <rect x="188" y="188" width="54" height="142" rx="9" fill="#EAD9B4"/><rect x="188" y="188" width="14" height="142" rx="7" fill="#fff" opacity=".35"/>
+      <line x1="215" y1="188" x2="215" y2="177" stroke="#4A3B2A" stroke-width="3.5" stroke-linecap="round"/>${flame(215,175,.9)}
+      <path d="M256,244 h84 l-9,86 q-1,10 -11,10 h-44 q-10,0 -11,-10 z" fill="url(#${gr})"/>
+      <clipPath id="${cl}b"><path d="M256,244 h84 l-9,86 q-1,10 -11,10 h-44 q-10,0 -11,-10 z"/></clipPath>
+      <g clip-path="url(#${cl}b)">${cfg.pattern!=='none'?`<rect x="250" y="240" width="96" height="106" fill="url(#${pid})"/>`:''}<rect x="256" y="244" width="14" height="100" fill="#fff" opacity=".16"/></g>
+      <ellipse cx="298" cy="244" rx="42" ry="10" fill="${dark}"/>
+      <rect x="288" y="200" width="20" height="46" rx="6" fill="${shade(c,40)}"/><line x1="298" y1="200" x2="298" y2="190" stroke="#4A3B2A" stroke-width="3" stroke-linecap="round"/>${flame(298,188,.7)}
+      <g transform="translate(86,268) rotate(-16)"><path d="M0,60 C6,40 8,20 6,0" stroke="#7C8A6E" stroke-width="3" fill="none"/>${[0,1,2,3,4].map(i=>`<ellipse cx="${6+(i%2?8:-8)}" cy="${8+i*11}" rx="7" ry="4" fill="#8E9C7E" transform="rotate(${i%2?28:-28} ${6+(i%2?8:-8)} ${8+i*11})"/>`).join('')}</g>
+      ${cfg.text?`<text x="298" y="300" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="14" fill="${ink}" opacity=".85">${esc(cfg.text.slice(0,10))}</text>`:''}`;
+  }
+  return `<svg class="psvg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">${defs}${body}</svg>`;
+}
+
+function avatarSVG(a, big){
+  const s = a.av, sz = big?140:100;
+  const hair = s.style==='bun'
+    ? `<circle cx="70" cy="30" r="14" fill="${s.hair}"/><path d="M42,62 q0,-34 28,-34 q28,0 28,34 q-8,-14 -28,-14 q-20,0 -28,14z" fill="${s.hair}"/>`
+    : s.style==='long'
+    ? `<path d="M38,88 q-6,-58 32,-58 q38,0 32,58 q-2,-26 -10,-30 q-6,10 -22,10 q-16,0 -22,-10 q-8,4 -10,30z" fill="${s.hair}"/>`
+    : `<path d="M42,66 q-2,-38 28,-38 q30,0 28,38 q-6,-16 -28,-16 q-22,0 -28,16z" fill="${s.hair}"/>`;
+  return `<svg viewBox="0 0 140 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <rect width="140" height="140" fill="${s.bg}"/><circle cx="70" cy="52" r="46" fill="#00000008"/>
+    <path d="M22,140 q4,-38 48,-38 q44,0 48,38z" fill="${s.shirt}"/>
+    <path d="M52,104 q18,10 36,0 l-2,14 q-16,8 -32,0z" fill="#00000022"/>
+    <circle cx="70" cy="62" r="26" fill="${s.skin}"/>${hair}
+    <circle cx="61" cy="63" r="2.4" fill="#2B2118"/><circle cx="79" cy="63" r="2.4" fill="#2B2118"/>
+    <path d="M63,74 q7,6 14,0" stroke="#2B2118" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle cx="54" cy="70" r="3.4" fill="#C05F3C" opacity=".25"/><circle cx="86" cy="70" r="3.4" fill="#C05F3C" opacity=".25"/>
+  </svg>`;
+}
+
+/* ---------- STATE ---------- */
+let CART = [], FAVS = new Set(), CURRENT_FILTER = 'All', CURRENT_PRODUCT = null;
+let CFG = {colorIdx:0, pattern:'none', sizeIdx:0, text:''};
+const DESIGN_QUEUE = [
+  {id:'d1', pid:'p2', cfg:{colorIdx:2,pattern:'waves',sizeIdx:0,text:''}, customer:'Léa M.', date:'Oct 25', note:'Wants waves in moss'},
+  {id:'d2', pid:'p3', cfg:{colorIdx:1,pattern:'none',sizeIdx:1,text:''}, customer:'Hana K.', date:'Oct 24', note:'Gift, larger size'},
+  {id:'d3', pid:'p6', cfg:{colorIdx:3,pattern:'dots',sizeIdx:0,text:'HOME'}, customer:'Omar B.', date:'Oct 23', note:'Label engraving "HOME"'}
+];
+const VERIFY_QUEUE = ['q1','q2'];
+
+/* ---------- HELPERS ---------- */
+function calcPrice(p, cfg){
+  let t = p.base + p.sizes[cfg.sizeIdx].add;
+  if(cfg.pattern!=='none') t += 8;
+  if(p.engrave && cfg.text.trim()) t += 5;
+  return t;
+}
+function cfgSummary(p, cfg){
+  const bits = [p.colors[cfg.colorIdx].n, p.patterns.includes(cfg.pattern)&&cfg.pattern!=='none'?cfg.pattern[0].toUpperCase()+cfg.pattern.slice(1):null, p.sizes[cfg.sizeIdx].l, cfg.text.trim()?`"${cfg.text.trim()}"`:null];
+  return bits.filter(Boolean).join(' · ');
+}
+const isCustom = (p,cfg)=> cfg.colorIdx!==0 || cfg.pattern!=='none' || cfg.sizeIdx!==0 || cfg.text.trim()!=='';
+
+function toast(msg){
+  const t = document.createElement('div');
+  t.className='toast';
+  t.innerHTML = `<svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>${esc(msg)}</span>`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),320)}, 3200);
+}
+const star = `<svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .9-5 4.8 1.2 7L12 17.8 5.8 21.2 7 14.2 2 9.4l7-.9L12 2z"/></svg>`;
+const check = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>`;
+
+/* ---------- RENDER: CUSTOMER ---------- */
+function renderChips(){
+  const cats = ['All', ...new Set(PRODUCTS.map(p=>p.cat))];
+  document.getElementById('catChips').innerHTML = cats.map(c=>`<button class="chip ${c===CURRENT_FILTER?'active':''}" onclick="filterCat('${c}')">${c}</button>`).join('');
+}
+function filterCat(c){ CURRENT_FILTER=c; renderChips(); renderGrid(); }
+
+function renderGrid(){
+  const list = PRODUCTS.filter(p=>CURRENT_FILTER==='All'||p.cat===CURRENT_FILTER);
+  document.getElementById('productGrid').innerHTML = list.map(p=>{
+    const a = A(p.artisanId);
+    const defaultCfg = {color:p.colors[0].h, pattern:'none', text:''};
+    return `<article class="pcard" onclick="openProduct('${p.id}')">
+      <div class="thumb">
+        <span class="vbadge">${check} Verified artisan</span>
+        <button class="fav ${FAVS.has(p.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${p.id}',this)" aria-label="Favorite">
+          <svg viewBox="0 0 24 24"><path d="M12 21C7 16.5 3 13 3 8.9 3 6 5.2 4 7.9 4c1.7 0 3.2.8 4.1 2.2C12.9 4.8 14.4 4 16.1 4 18.8 4 21 6 21 8.9c0 4.1-4 7.6-9 12.1z"/></svg></button>
+        ${productSVG(p.svg, defaultCfg)}
+      </div>
+      <div class="pinfo">
+        <span class="cat">${p.cat}</span>
+        <h3>${p.name}</h3>
+        <div class="by">by ${a.name} · ${a.loc}</div>
+        <div class="prow">
+          <div class="price">${money(p.base)}<small>customizable</small></div>
+          <div class="rate">${star} ${p.rating}</div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+function toggleFav(id, btn){
+  if(FAVS.has(id)){FAVS.delete(id);btn.classList.remove('on');toast('Removed from favorites')}
+  else{FAVS.add(id);btn.classList.add('on');toast('Saved to favorites ♥')}
+}
+
+function renderArtisans(){
+  document.getElementById('artisanGrid').innerHTML = ARTISANS.filter(a=>a.verified).map(a=>`
+    <div class="acard" onclick="toast('${a.name}\\'s full profile — coming in v1.1')">
+      <div class="av">${avatarSVG(a)}</div>
+      <h3>${a.name}</h3>
+      <div class="craft">${a.craft}</div>
+      <div class="loc">${a.loc} · ${a.sales} pieces sold</div>
+      <div class="rate" style="justify-content:center;margin-top:6px">${star} ${a.rating}</div>
+      <span class="vpill">${check} Verified</span>
+    </div>`).join('');
+}
+
+/* ---------- PRODUCT DETAIL ---------- */
+function openProduct(pid){
+  CURRENT_PRODUCT = PRODUCTS.find(p=>p.id===pid);
+  CFG = {colorIdx:0, pattern:'none', sizeIdx:0, text:''};
+  document.getElementById('view-customer').style.display='none';
+  document.getElementById('view-product').style.display='block';
+  renderDetail();
+  window.scrollTo({top:0});
+}
+function renderDetail(){
+  const p = CURRENT_PRODUCT, a = A(p.artisanId);
+  const price = calcPrice(p, CFG);
+  document.getElementById('pdPreview').innerHTML = productSVG(p.svg, {color:p.colors[CFG.colorIdx].h, pattern:CFG.pattern, text:CFG.text});
+  document.getElementById('pdThumbs').innerHTML = p.colors.slice(0,4).map((c,i)=>`
+    <div class="tn ${i===CFG.colorIdx?'active':''}" onclick="CFG.colorIdx=${i};renderDetail()">${productSVG(p.svg,{color:c.h,pattern:'none',text:''})}</div>`).join('');
+  document.getElementById('pdInfo').innerHTML = `
+    <span class="cat" style="font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft);font-weight:700">${p.cat}</span>
+    <h1>${p.name}</h1>
+    <div class="pd-by">
+      <div class="av">${avatarSVG(a)}</div>
+      <div><b>${a.name}</b><span>${a.craft} · ${a.loc} · <span style="color:var(--sage);font-weight:700">✓ Verified</span></span></div>
+      <div style="margin-left:auto" class="rate">${star} ${p.rating} <span style="color:var(--ink-soft);font-weight:500">(${p.reviews})</span></div>
+    </div>
+    <p style="color:var(--ink-soft);font-size:14px;margin-top:10px">${p.desc}</p>
+    <div class="pd-price" id="pdPrice">${money(price)} <small>artisan keeps 100%</small></div>
+    <div style="font-size:12.5px;color:var(--ink-soft)">⏱ Made to order in ${p.lead} · ships worldwide</div>
+
+    <div class="opt-block"><div class="lbl">Color <b>${p.colors[CFG.colorIdx].n}</b></div>
+      <div class="swatches">${p.colors.map((c,i)=>`<button class="sw ${i===CFG.colorIdx?'active':''}" style="background:${c.h}" title="${c.n}" onclick="CFG.colorIdx=${i};renderDetail()"></button>`).join('')}</div></div>
+
+    <div class="opt-block"><div class="lbl">Pattern <b>+$8 · hand-applied</b></div>
+      <div class="pbtns">${p.patterns.map(pt=>`<button class="pbtn ${CFG.pattern===pt?'active':''}" onclick="CFG.pattern='${pt}';renderDetail()">${pt==='none'?'Plain':pt[0].toUpperCase()+pt.slice(1)}</button>`).join('')}</div></div>
+
+    <div class="opt-block"><div class="lbl">Size</div>
+      <div class="sbtns">${p.sizes.map((s,i)=>`<button class="sbtn ${CFG.sizeIdx===i?'active':''}" onclick="CFG.sizeIdx=${i};renderDetail()">${s.l}${s.add?` +$${s.add}`:''}</button>`).join('')}</div></div>
+
+    ${p.engrave?`<div class="opt-block"><div class="lbl">Personal engraving <b>+$5 · optional</b></div>
+      <input class="engrave-in" maxlength="18" placeholder="e.g. a name, date or word…" value="${esc(CFG.text)}" oninput="CFG.text=this.value;debouncePreview()">
+    </div>`:''}
+
+    <div class="ai-bar">
+      <div class="spark"><svg viewBox="0 0 24 24"><path d="M12 2l2.1 5.9L20 10l-5.9 2.1L12 18l-2.1-5.9L4 10l5.9-2.1L12 2z"/><path d="M19 16l.9 2.4L22.5 19l-2.6.9L19 22l-.9-2.1-2.6-.9 2.6-.6L19 16z"/></svg></div>
+      <div><b>KALART AI Customizer</b><small>Generates a design mockup in the artisan's signature style — sent for their approval on checkout.</small></div>
+      <button class="ai-gen-btn" id="aiBtn" onclick="generateMockup()">✨ Generate mockup</button>
+    </div>
+
+    <div class="buyrow">
+      <button class="btn btn-ghost" onclick="addToCart(false)">Add to basket · <span id="btnPrice">${money(price)}</span></button>
+      <button class="btn btn-primary" onclick="addToCart(true)">Buy now →</button>
+    </div>
+    <div class="cert-note">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="#C9A227" stroke-width="1.8"/><circle cx="12" cy="11" r="3.4" stroke="#C9A227" stroke-width="1.8"/><path d="M9.5 14l-1 6 3.5-2 3.5 2-1-6" stroke="#C9A227" stroke-width="1.8" fill="none"/></svg>
+      <span>This piece ships with a signed <b>Certificate of Authenticity</b> (photo + artisan signature + unique ID), recorded on your order.</span>
+    </div>`;
+}
+let debT; function debouncePreview(){ clearTimeout(debT); debT=setTimeout(()=>{ const p=CURRENT_PRODUCT; document.getElementById('pdPreview').innerHTML = productSVG(p.svg,{color:p.colors[CFG.colorIdx].h,pattern:CFG.pattern,text:CFG.text}); }, 250); }
+
+const GEN_STEPS = [['Analyzing artisan style…','Meera\'s terracotta heritage'],['Composing your design…','color · pattern · form'],['Rendering photoreal mockup…','almost there'],['Mockup ready ✓','review your unique piece']];
+function generateMockup(){
+  const p = CURRENT_PRODUCT, stage = document.getElementById('pdStage');
+  if(stage.classList.contains('gen')) return;
+  stage.classList.add('gen');
+  document.getElementById('aiBtn').disabled = true;
+  let step = 0;
+  const status = document.getElementById('genStatus'), sub = document.getElementById('genSub');
+  status.textContent = GEN_STEPS[0][0]; sub.textContent = GEN_STEPS[0][1];
+  const iv = setInterval(()=>{
+    step++;
+    if(step < GEN_STEPS.length){ status.textContent = GEN_STEPS[step][0]; sub.textContent = GEN_STEPS[step][1]; }
+    else{
+      clearInterval(iv);
+      stage.classList.remove('gen');
+      document.getElementById('aiBtn').disabled = false;
+      // AI suggestion: harmonized random config
+      CFG.colorIdx = Math.floor(Math.random()*p.colors.length);
+      const pats = p.patterns.filter(x=>x!=='none');
+      CFG.pattern = Math.random()<.75 ? pats[Math.floor(Math.random()*pats.length)] : 'none';
+      if(p.engrave && !CFG.text && Math.random()<.5){ const words=['Amore','Sol','Maison','Aria','Kaya','Noor']; CFG.text = words[Math.floor(Math.random()*words.length)]; }
+      renderDetail();
+      toast('AI mockup generated — sent for artisan approval at checkout ✨');
+    }
+  }, 700);
+}
+
+/* ---------- CART ---------- */
+function addToCart(buyNow){
+  const p = CURRENT_PRODUCT;
+  const item = {key:p.id+JSON.stringify(CFG), pid:p.id, cfg:{...CFG}, qty:1, price:calcPrice(p,CFG), custom:isCustom(p,CFG)};
+  const ex = CART.find(c=>c.key===item.key);
+  if(ex) ex.qty++; else CART.push(item);
+  updateCartBadge(); renderCart();
+  if(buyNow){ openCart(); setTimeout(openCheckout, 350); }
+  else { toast(item.custom?'Added — custom design will need artisan approval':'Added to basket'); openCart(); }
+}
+function updateCartBadge(){
+  const n = CART.reduce((s,c)=>s+c.qty,0);
+  const el = document.getElementById('cartCount');
+  el.textContent = n; el.classList.toggle('show', n>0);
+}
+function renderCart(){
+  const body = document.getElementById('cartBody'), foot = document.getElementById('cartFoot');
+  if(!CART.length){
+    foot.style.display='none';
+    body.innerHTML = `<div class="empty-cart"><svg fill="none" stroke-width="1.4" viewBox="0 0 24 24"><path d="M6 7h12l-1.2 12.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 7z"/><path d="M9 10V6a3 3 0 016 0v4"/></svg><p>Your basket is empty.</p><p style="font-size:12.5px">Handmade treasures await ✦</p></div>`;
+    return;
+  }
+  foot.style.display='block';
+  body.innerHTML = CART.map((c,i)=>{
+    const p = PRODUCTS.find(x=>x.id===c.pid);
+    return `<div class="citem">
+      <div class="ci-thumb">${productSVG(p.svg,{color:p.colors[c.cfg.colorIdx].h,pattern:c.cfg.pattern,text:c.cfg.text})}</div>
+      <div class="ci-info">
+        <b>${p.name}${c.custom?'<span class="appr-tag">⏳ needs artisan approval</span>':''}</b>
+        <div class="cfg">${cfgSummary(p,c.cfg)}</div>
+        <div class="qty"><button onclick="chgQty(${i},-1)">−</button><span>${c.qty}</span><button onclick="chgQty(${i},1)">+</button></div>
+      </div>
+      <div><div class="ci-price">${money(c.price*c.qty)}</div><button class="rm" onclick="CART.splice(${i},1);updateCartBadge();renderCart();toast('Item removed')">remove</button></div>
+    </div>`;
+  }).join('');
+  const sub = CART.reduce((s,c)=>s+c.price*c.qty,0);
+  document.getElementById('sumSub').textContent = money(sub);
+  document.getElementById('sumTotal').textContent = money(sub);
+}
+function chgQty(i,d){ CART[i].qty+=d; if(CART[i].qty<1) CART.splice(i,1); updateCartBadge(); renderCart(); }
+function openCart(){ document.getElementById('cartDrawer').classList.add('open'); document.getElementById('backdrop').classList.add('show'); renderCart(); }
+function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+
+/* ---------- CHECKOUT ---------- */
+function openCheckout(){
+  if(!CART.length){ toast('Your basket is empty'); return; }
+  closeCart();
+  const total = CART.reduce((s,c)=>s+c.price*c.qty,0);
+  document.getElementById('mcTitle').textContent = 'Checkout';
+  document.getElementById('mcBody').innerHTML = `
+    <div class="f2">
+      <div class="field"><label>Full name</label><input id="coName" placeholder="Amelie Fontaine"></div>
+      <div class="field"><label>Email</label><input id="coEmail" type="email" placeholder="you@email.com"></div>
+    </div>
+    <div class="field"><label>Shipping address</label><input id="coAddr" placeholder="12 Rue des Artisans, Paris"></div>
+    <div class="f2">
+      <div class="field"><label>Card number</label><input id="coCard" placeholder="4242 4242 4242 4242" maxlength="19"></div>
+      <div class="field"><label>Expiry / CVC</label><input id="coExp" placeholder="12/28 · 123"></div>
+    </div>
+    <div class="commission-note" style="margin-top:6px">🌿 Order total ${money(total)} — platform commission $0.00. Artisans receive 100%.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="placeOrder()">Place order · ${money(total)}</button>
+    <p style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px">Demo checkout — no real payment is processed.</p>`;
+  document.getElementById('modal').classList.add('show');
+}
+function placeOrder(){
+  const req = [['coName','name'],['coEmail','email'],['coAddr','address'],['coCard','card'],['coExp','expiry']];
+  let ok = true;
+  req.forEach(([id])=>{ const f=document.getElementById(id).closest('.field'); const bad=!document.getElementById(id).value.trim(); f.classList.toggle('err',bad); if(bad) ok=false; });
+  if(!ok){ toast('Please complete all fields'); return; }
+  const needsApproval = CART.some(c=>c.custom);
+  const orderId = 'KA-'+Math.floor(2300+Math.random()*600);
+  const p0 = PRODUCTS.find(x=>x.id===CART[0].pid), a0 = A(p0.artisanId);
+  const total = CART.reduce((s,c)=>s+c.price*c.qty,0);
+  // push custom designs to artisan approval queue
+  CART.forEach(c=>{ if(c.custom) DESIGN_QUEUE.unshift({id:'d'+Date.now()+Math.random(), pid:c.pid, cfg:c.cfg, customer:document.getElementById('coName').value.trim()||'Guest', date:'Oct 26', note:'New order '+orderId, approved:false}); });
+  CART = []; updateCartBadge();
+  document.getElementById('mcTitle').textContent = 'Order confirmed';
+  document.getElementById('mcBody').innerHTML = `
+    <div class="success-anim">
+      <div class="check-circle"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3 class="serif" style="font-size:22px">Thank you! Order #${orderId}</h3>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin-top:6px">${needsApproval?'Your custom designs were sent to the artisans for approval — production starts once approved.':'Production starts right away.'} Total paid: <b>${money(total)}</b> · commission <b style="color:var(--sage)">$0.00</b></p>
+      <div class="cert-card">
+        <div class="ct">
+          <h4>Certificate of Authenticity</h4>
+          <div class="seal"><svg viewBox="0 0 60 60"><circle cx="30" cy="24" r="17" fill="#C9A227"/><circle cx="30" cy="24" r="12.5" fill="#FDF6E7"/><text x="30" y="30" text-anchor="middle" font-family="Georgia" font-size="15" fill="#8A6B1D" font-weight="bold">K</text><path d="M20,36 L16,56 L30,48 L44,56 L40,36 Z" fill="#C05F3C"/></svg></div>
+          <p>This certifies that <b>${p0.name}</b> was handmade by <b>${a0.name}</b><br>(${a0.loc}) · Unique ID KAL-${orderId}-${Math.floor(1000+Math.random()*9000)}</p>
+        </div>
+      </div>
+      <button class="btn btn-dark btn-sm" style="margin-top:18px" onclick="closeModal()">Continue browsing</button>
+    </div>`;
+  toast('Order placed — certificate issued 🎉');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+/* ---------- ARTISAN DASHBOARD ---------- */
+function renderArtisanDash(){
+  const q = document.getElementById('designQueue');
+  const pending = DESIGN_QUEUE.filter(d=>!d.approved && !d.rejected);
+  document.getElementById('statPending').textContent = pending.length + 1; // + seeded ones belong to other artisans conceptually
+  q.innerHTML = pending.length ? pending.map(d=>{
+    const p = PRODUCTS.find(x=>x.id===d.pid);
+    return `<div class="design-card" id="dc-${d.id}">
+      <div class="dc-prev">${productSVG(p.svg,{color:p.colors[d.cfg.colorIdx].h,pattern:d.cfg.pattern,text:d.cfg.text||''})}</div>
+      <div class="dc-info"><b>${p.name}</b><p>${cfgSummary(p,d.cfg)||'Standard config'}</p><p style="color:var(--terra)">Customer: ${esc(d.customer)} · ${d.date} · “${esc(d.note)}”</p>
+      <p style="font-size:12px">Payout to you: <b>${money(calcPrice(p,d.cfg))}</b> (0% commission)</p></div>
+      <div class="dc-actions">
+        <button class="btn-ok" onclick="decideDesign('${d.id}',true)">✓ Approve & start</button>
+        <button class="btn-no" onclick="decideDesign('${d.id}',false)">Decline</button>
+      </div></div>`;
+  }).join('') : '<div class="empty-state">No designs awaiting approval ✓</div>';
+
+  document.getElementById('artisanProducts').innerHTML = `
+    <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Lead time</th><th>Live</th></tr></thead><tbody>
+    ${PRODUCTS.filter(p=>p.artisanId==='a1').map(p=>`<tr><td style="display:flex;align-items:center;gap:10px"><span style="width:44px;height:44px;background:#F4E9D8;border-radius:10px;display:grid;place-items:center;overflow:hidden">${productSVG(p.svg,{color:p.colors[0].h,pattern:'none',text:''})}</span><b>${p.name}</b></td><td>${p.cat}</td><td>from ${money(p.base)}</td><td>${p.lead}</td><td><button class="toggle on" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'Listing is live':'Listing paused')"></button></td></tr>`).join('')}
+    </tbody></table>`;
+}
+function decideDesign(id, ok){
+  const d = DESIGN_QUEUE.find(x=>x.id===id);
+  d[ok?'approved':'rejected'] = true;
+  const el = document.getElementById('dc-'+id);
+  if(el){ el.style.transition='.4s'; el.style.opacity=0; el.style.transform='translateX(30px)'; setTimeout(()=>el.remove(),400); }
+  if(ok){
+    const p = PRODUCTS.find(x=>x.id===d.pid);
+    const tbody = document.querySelector('#artisanOrders tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>#KA-${Math.floor(2300+Math.random()*600)}</td><td>${p.name} · ${cfgSummary(p,d.cfg)}</td><td>${esc(d.customer)}</td><td>${money(calcPrice(p,d.cfg))}</td><td><span class="status st-wait">In production</span></td>`;
+    tbody.prepend(tr);
+    toast('Design approved — moved to production');
+  } else toast('Design declined — customer notified & refunded');
+  renderArtisanDash();
+}
+
+/* ---------- ADMIN DASHBOARD ---------- */
+function renderAdmin(){
+  document.getElementById('statQueue').textContent = VERIFY_QUEUE.length;
+  const q = document.getElementById('verifyQueue');
+  q.innerHTML = VERIFY_QUEUE.length ? VERIFY_QUEUE.map(id=>{
+    const a = A(id);
+    return `<div class="verify-card" id="vc-${id}">
+      <div class="av">${avatarSVG(a)}</div>
+      <div class="dc-info"><b>${a.name} — ${a.craft}</b><p>${a.loc} · ${esc(a.bio)}</p>
+      <div class="docs"><span class="doc-tag">🪪 Gov ID</span><span class="doc-tag">📷 Workshop photos (12)</span><span class="doc-tag">🎥 Craft video</span><span class="doc-tag">🧾 Portfolio (24)</span></div></div>
+      <div class="dc-actions">
+        <button class="btn-ok" onclick="verifyArtisan('${id}',true)">✓ Verify artisan</button>
+        <button class="btn-no" onclick="verifyArtisan('${id}',false)">Reject</button>
+      </div></div>`;
+  }).join('') : '<div class="empty-state">Verification queue is clear ✓</div>';
+}
+function verifyArtisan(id, ok){
+  const idx = VERIFY_QUEUE.indexOf(id); if(idx>-1) VERIFY_QUEUE.splice(idx,1);
+  const a = A(id);
+  if(ok){ a.verified = true; renderArtisans(); toast(a.name+' is now verified — badge granted 🛡'); }
+  else toast(a.name+'\'s application rejected — reason sent by email');
+  const el = document.getElementById('vc-'+id);
+  if(el){ el.style.transition='.4s'; el.style.opacity=0; setTimeout(()=>{el.remove(); renderAdmin();},380); }
+  else renderAdmin();
+}
+
+/* ---------- VIEW ROUTING ---------- */
+function setMode(m){
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active', b.dataset.mode===m));
+  document.getElementById('view-customer').style.display = m==='customer'?'block':'none';
+  document.getElementById('view-product').style.display = 'none';
+  document.getElementById('view-artisan').style.display = m==='artisan'?'block':'none';
+  document.getElementById('view-admin').style.display = m==='admin'?'block':'none';
+  document.querySelector('nav.mainnav').style.visibility = m==='customer'?'visible':'hidden';
+  if(m==='artisan') renderArtisanDash();
+  if(m==='admin') renderAdmin();
+  window.scrollTo({top:0});
+  if(m!=='customer') toast(m==='artisan'?'Artisan Studio — review incoming custom designs':'Admin console — verification & trust');
+}
+function goCustomer(scroll){
+  document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active', b.dataset.mode==='customer'));
+  document.getElementById('view-customer').style.display='block';
+  document.getElementById('view-product').style.display='none';
+  document.getElementById('view-artisan').style.display='none';
+  document.getElementById('view-admin').style.display='none';
+  document.querySelector('nav.mainnav').style.visibility='visible';
+  if(scroll) window.scrollTo({top:0});
+}
+function scrollTo2(id){ goCustomer(); setTimeout(()=>document.getElementById(id).scrollIntoView({behavior:'smooth'}),50); }
+
+/* ---------- INIT ---------- */
+document.getElementById('heroVase').innerHTML = productSVG('vase',{color:'#C05F3C',pattern:'waves',text:''});
+renderChips(); renderGrid(); renderArtisans(); renderCart(); updateCartBadge();
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeCart(); closeModal(); } });
+</script>
+</body>
+</html>

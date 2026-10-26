@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import CartDrawer from "./components/CartDrawer";
+import CheckoutModal from "./components/CheckoutModal";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -44,11 +46,20 @@ function ScrollAndTitle() {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = TITLES[pathname] ?? (pathname.startsWith("/product/") ? "Handmade piece · KALART"
-      : pathname.startsWith("/artisan-profile") || pathname.startsWith("/artisans/") ? "Artisan profile · KALART"
-      : pathname.startsWith("/orders/") ? "Order details · KALART"
-      : pathname.startsWith("/legal/") ? "Policies · KALART"
-      : pathname.startsWith("/crafts/") ? "Craft · KALART" : "KALART");
+    document.title =
+      TITLES[pathname] ??
+      (pathname.startsWith("/product/")
+        ? "Handmade piece · KALART"
+        : pathname.startsWith("/artisan-profile") ||
+          pathname.startsWith("/artisans/")
+        ? "Artisan profile · KALART"
+        : pathname.startsWith("/orders/")
+        ? "Order details · KALART"
+        : pathname.startsWith("/legal/")
+        ? "Policies · KALART"
+        : pathname.startsWith("/crafts/")
+        ? "Craft · KALART"
+        : "KALART");
   }, [pathname]);
   return null;
 }
@@ -56,7 +67,9 @@ function ScrollAndTitle() {
 export default function App() {
   return (
     <div style={{ display: "flex", minHeight: "100dvh", flexDirection: "column" }}>
-      <a className="skip-link" href="#main">Skip to content</a>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <ScrollAndTitle />
       <Header />
       <div style={{ flex: 1 }}>
@@ -87,6 +100,8 @@ export default function App() {
         </Routes>
       </div>
       <Footer />
+      <CartDrawer />
+      <CheckoutModal />
     </div>
   );
 }

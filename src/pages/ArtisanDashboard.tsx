@@ -1,228 +1,283 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { api, ARTISANS, PRODUCTS, formatINR, type DesignRequest, type Order } from "../data/store";
 import { useApp } from "../context/AppContext";
-import { ConfirmDialog, EmptyState, StatusBadge } from "../components/ui";
 import {
-  IconArrowRight, IconBox, IconChart, IconCheck, IconClose, IconEye,
-  IconRupee, IconSparkle, IconUpload, IconRefresh, IconChat, IconShield, IconGrid,
-} from "../components/icons";
+  SHOWCASE_PRODUCTS,
+  SHOWCASE_ARTISANS,
+  INITIAL_DESIGN_QUEUE,
+  DesignRequest,
+  calcShowcasePrice,
+  cfgSummary,
+} from "../data/showcaseData";
+import { ProductSVG, AvatarSVG } from "../components/CraftSVG";
 
 export default function ArtisanDashboard() {
-  const { user, toast } = useApp();
-  const artisan = ARTISANS.find((a) => a.id === user?.artisanId) ?? ARTISANS[0];
-  const [requests, setRequests] = useState<DesignRequest[] | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const confirmRef = useRef<HTMLDialogElement>(null);
-  const pendingDecline = useRef<string | null>(null);
+  const { toast } = useApp();
+  const artisan = SHOWCASE_ARTISANS[0]; // Meera Kapoor
 
-  const myProducts = useMemo(() => PRODUCTS.filter((p) => p.artisanId === artisan.id), [artisan.id]);
+  const [queue, setQueue] = useState<DesignRequest[]>(() => {
+    try {
+      const stored = localStorage.getItem("kalart_custom_designs");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      }
+    } catch {}
+    return INITIAL_DESIGN_QUEUE;
+  });
 
-  const load = () => {
-    api.listRequests(artisan.id).then(setRequests);
-    api.listOrders().then((os) => setOrders(os.filter((o) => o.lines.some((l) => PRODUCTS.find((p) => p.id === l.productId)?.artisanId === artisan.id))));
-  };
-  useEffect(load, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [listingsStatus, setListingsStatus] = useState<Record<string, boolean>>({
+    p1: true,
+    p6: true,
+  });
 
-  if (user?.role !== "artisan") {
-    return (
-      <main id="main" className="container section">
-        <EmptyState title="Artisan workspace — demo access"
-          body={`Sign in with ravi@kalart.in / demo1234 to see ${artisan.name}'s live queue, or explore this view as ${artisan.name}.`}
-          action={{ label: `Explore as ${artisan.name}`, onClick: () => window.location.assign("/login") }} />
-      </main>
+  const [activeOrders, setActiveOrders] = useState([
+    { id: "KA-2412", item: "Terra Organic Vase · Terracotta · Waves", patron: "Arthur Pendelton", payout: "$76.00", status: "In production" },
+    { id: "KA-2398", item: "Hearth Candle Set · Cream · Dots · 'HOME'", patron: "Elena Rostova", payout: "$55.00", status: "Glaze Firing" },
+    { id: "KA-2385", item: "Terra Organic Vase · Sand · Large", patron: "Kenji Sato", payout: "$96.00", status: "Quality Check" },
+  ]);
+
+  const pendingDesigns = queue.filter((d) => !d.approved && !d.rejected);
+
+  const handleDecision = (id: string, approved: boolean) => {
+    const item = queue.find((d) => d.id === id);
+    if (!item) return;
+
+    const p = SHOWCASE_PRODUCTS.find((x) => x.id === item.pid) || SHOWCASE_PRODUCTS[0];
+
+    const updated = queue.map((d) =>
+      d.id === id ? { ...d, approved, rejected: !approved } : d
     );
-  }
+    setQueue(updated);
+    try {
+      localStorage.setItem("kalart_custom_designs", JSON.stringify(updated));
+    } catch {}
 
-  const act = async (id: string, patch: Partial<DesignRequest>, msg: string) => {
-    await api.updateRequest(id, patch);
-    setRequests((rs) => (rs ? rs.map((r) => (r.id === id ? { ...r, ...patch } : r)) : rs));
-    toast("success", msg);
+    if (approved) {
+      const newOrder = {
+        id: "KA-" + Math.floor(2300 + Math.random() * 600),
+        item: `${p.name} · ${cfgSummary(p, item.cfg)}`,
+        patron: item.customer,
+        payout: `$${calcShowcasePrice(p, item.cfg).toFixed(2)}`,
+        status: "In production",
+      };
+      setActiveOrders((prev) => [newOrder, ...prev]);
+      toast("success", `Approved custom design for ${item.customer} — moved to workshop queue`);
+    } else {
+      toast("info", `Declined design request — customer notified and fully refunded`);
+    }
   };
 
-  const newCount = requests?.filter((r) => r.status === "new").length ?? 0;
-  const earnings = orders.reduce((s, o) => s + Math.round(o.total * 0.85), 0);
+  const toggleListing = (pid: string) => {
+    setListingsStatus((prev) => {
+      const next = !prev[pid];
+      toast(next ? "success" : "info", next ? "Listing is now live on KALART" : "Listing paused");
+      return { ...prev, [pid]: next };
+    });
+  };
+
+  const myProducts = SHOWCASE_PRODUCTS.filter((p) => p.artisanId === artisan.id);
 
   return (
-    <main id="main" className="container section--tight">
-      <div className="row row--between row--wrap" style={{ gap: "var(--sp-3)", marginBlock: "var(--sp-4)" }}>
-        <div>
-          <p className="eyebrow" style={{ marginBottom: 2 }}>Artisan workspace</p>
-          <h1 style={{ margin: 0 }}>{artisan.name}</h1>
-          <p className="text-muted text-small" style={{ margin: "4px 0 0" }}>{artisan.craft} · {artisan.location}{artisan.verified ? " · Verified partner" : " · Verification pending"}</p>
+    <main id="main" className="artisan-dash" style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 24px 70px" }}>
+      {/* HEADER BANNER */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ width: 68, height: 68, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--terra)" }}>
+            <AvatarSVG avatar={artisan.av} />
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <h1 style={{ fontSize: "clamp(24px, 3.2vw, 32px)", margin: 0 }}>{artisan.name}'s Studio</h1>
+              <span className="vpill" style={{ fontSize: 11 }}>✓ Verified Master Potter</span>
+            </div>
+            <p style={{ color: "var(--ink-soft)", margin: "4px 0 0", fontSize: 13.5 }}>
+              {artisan.craft} Studio · {artisan.loc} · 0% Platform Commission Account
+            </p>
+          </div>
         </div>
-        <Link to="/sell" className="btn btn--outline btn--sm">Onboarding &amp; verification</Link>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <Link to="/customize" className="btn btn-ghost btn-sm">
+            ✨ Open Customizer
+          </Link>
+          <Link to="/" className="btn btn-primary btn-sm">
+            Browse Storefront
+          </Link>
+        </div>
       </div>
 
-      {!artisan.verified && (
-        <div className="card card--pad row" style={{ gap: 12, borderColor: "var(--ka-warning)", marginBottom: "var(--sp-4)" }}>
-          <IconShield size={20} />
-          <p className="text-small" style={{ margin: 0 }}>Upload two authenticity photos of your workshop to complete verification and unlock featured placement.</p>
+      {/* KPI METRIC CARDS */}
+      <div className="dgrid">
+        <div className="stat-card">
+          <small>Custom Designs Awaiting Approval</small>
+          <b style={{ color: "var(--terra)" }}>{pendingDesigns.length}</b>
+          <div className="trend">Requires review within 24h</div>
         </div>
-      )}
+        <div className="stat-card">
+          <small>Total Master Sales</small>
+          <b>{artisan.sales} pcs</b>
+          <div className="trend">Across 18 patron countries</div>
+        </div>
+        <div className="stat-card">
+          <small>Artisan Share / Commission</small>
+          <b style={{ color: "var(--sage)" }}>100% / 0%</b>
+          <div className="trend">You keep every dollar</div>
+        </div>
+        <div className="stat-card">
+          <small>Patron Satisfaction Rating</small>
+          <b>★ {artisan.rating}</b>
+          <div className="trend">128 verified reviews</div>
+        </div>
+      </div>
 
-      <section className="ka-kpis" aria-label="Key metrics" style={{ marginBottom: "var(--sp-5)" }}>
-        <Kpi icon={<IconSparkle size={17} />} num={String(newCount)} lbl="New design requests" tone={newCount ? "clay" : undefined} />
-        <Kpi icon={<IconBox size={17} />} num={String(orders.filter((o) => ["placed", "customization_review", "in_production"].includes(o.status)).length)} lbl="In production" />
-        <Kpi icon={<IconRupee size={17} />} num={formatINR(earnings)} lbl="Earnings (85% share)" />
-        <Kpi icon={<IconChart size={17} />} num={`${artisan.rating} ★`} lbl={`${artisan.reviews} reviews`} />
+      {/* SECTION 1: CUSTOM DESIGNS QUEUE */}
+      <section style={{ marginTop: 36 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h2 style={{ fontSize: 22, margin: 0 }}>
+            Incoming Bespoke Requests ({pendingDesigns.length})
+          </h2>
+          <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
+            Patrons pay upfront into direct escrow · Work begins upon your approval
+          </span>
+        </div>
+
+        <div className="design-queue">
+          {pendingDesigns.length === 0 ? (
+            <div className="empty-state" style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: "var(--radius)", border: "1px dashed var(--line)" }}>
+              <p style={{ fontSize: 28, margin: 0 }}>✓</p>
+              <h3 style={{ fontFamily: "Fraunces, serif", fontSize: 18, marginTop: 8 }}>
+                All custom briefs approved!
+              </h3>
+              <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: "4px 0 0" }}>
+                New orders placed via the AI Customizer will appear here in real time.
+              </p>
+            </div>
+          ) : (
+            pendingDesigns.map((d) => {
+              const p = SHOWCASE_PRODUCTS.find((x) => x.id === d.pid) || SHOWCASE_PRODUCTS[0];
+              const price = calcShowcasePrice(p, d.cfg);
+
+              return (
+                <div key={d.id} className="design-card">
+                  <div className="dc-prev">
+                    <ProductSVG
+                      type={p.svg}
+                      cfg={{
+                        color: p.colors[d.cfg.colorIdx]?.h || "#C05F3C",
+                        pattern: d.cfg.pattern,
+                        text: d.cfg.text,
+                      }}
+                    />
+                  </div>
+
+                  <div className="dc-info">
+                    <b>{p.name}</b>
+                    <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: "2px 0 4px" }}>
+                      Configuration: <b>{cfgSummary(p, d.cfg)}</b>
+                    </p>
+                    <p style={{ color: "var(--terra)", fontSize: 13, margin: "2px 0" }}>
+                      Patron: <b>{d.customer}</b> · Submitted {d.date} · “{d.note}”
+                    </p>
+                    <p style={{ fontSize: 13, margin: "4px 0 0" }}>
+                      Payout to you: <b>${price.toFixed(2)}</b> (0% platform commission)
+                    </p>
+                  </div>
+
+                  <div className="dc-actions">
+                    <button
+                      className="btn-ok"
+                      onClick={() => handleDecision(d.id, true)}
+                    >
+                      ✓ Approve &amp; start
+                    </button>
+                    <button
+                      className="btn-no"
+                      onClick={() => handleDecision(d.id, false)}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </section>
 
-      <div className="ka-dash">
-        <nav className="ka-side" aria-label="Workspace sections">
-          <SideLink active href="#requests"><IconSparkle size={16} /> Design requests</SideLink>
-          <SideLink href="#orders"><IconBox size={16} /> Orders</SideLink>
-          <SideLink href="#catalogue"><IconGrid size={16} /> My products</SideLink>
-          <SideLink href="#uploads"><IconUpload size={16} /> Add a product</SideLink>
-        </nav>
-
-        <div className="stack" style={{ gap: "var(--sp-6)" }}>
-          {/* REQUESTS */}
-          <section id="requests" aria-labelledby="req-h">
-            <h2 id="req-h" style={{ fontSize: "1.2rem" }}>Incoming customisation briefs</h2>
-            <p className="text-small text-muted">Review feasibility, request changes, or approve. Customers wait on you here.</p>
-            {requests == null ? (
-              <div className="stack">{[0, 1].map((i) => <div key={i} className="skeleton" style={{ height: 110 }} role="status" aria-label="Loading requests" />)}</div>
-            ) : requests.length === 0 ? (
-              <EmptyState title="No open briefs" body="When a customer commissions a customised piece it lands here within seconds." />
-            ) : (
-              <div className="stack">
-                {requests.map((r) => (
-                  <article key={r.id} className="card card--pad stack" style={{ gap: "var(--sp-3)" }}>
-                    <div className="row row--between" style={{ flexWrap: "wrap", gap: 8 }}>
-                      <strong style={{ color: "var(--ka-charcoal)" }}>{r.product} <span className="text-muted" style={{ fontWeight: 400 }}>· {r.orderRef}</span></strong>
-                      <StatusBadge status={r.status} />
-                    </div>
-                    <p className="text-small" style={{ margin: 0 }}>{r.summary}</p>
-                    <p className="text-small text-muted" style={{ margin: 0 }}>From {r.customer} · received {new Date(r.receivedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}{r.uploadedRef ? ` · reference attached (${r.uploadedRef})` : ""}</p>
-                    {r.feasibilityNote && <p className="text-small row" style={{ gap: 6, margin: 0, color: "var(--ka-indigo)" }}><IconChat size={14} /> {r.feasibilityNote}</p>}
-                    {(r.status === "new" || r.status === "revision_requested") && (
-                      <div className="row row--wrap" style={{ gap: "var(--sp-2)" }}>
-                        <button className="btn btn--primary btn--sm" onClick={() => act(r.id, { status: "approved", feasibilityNote: "Confirmed at listed price; starting after customer approval." }, `Approved ${r.id} — customer notified.`)}>
-                          <IconCheck size={14} /> Feasible — approve
-                        </button>
-                        <button className="btn btn--outline btn--sm" onClick={() => act(r.id, { status: "revision_requested", feasibilityNote: "Could you move the initials 1 cm up? Border sits too close." }, `Revision requested on ${r.id}.`)}>
-                          <IconRefresh size={14} /> Request revision
-                        </button>
-                        <button className="btn btn--ghost btn--sm" style={{ color: "var(--ka-error)" }} onClick={() => { pendingDecline.current = r.id; confirmRef.current?.showModal(); }}>
-                          <IconClose size={14} /> Decline
-                        </button>
+      {/* SECTION 2: WORKSHOP CATALOG LISTINGS */}
+      <section style={{ marginTop: 44 }}>
+        <h2 style={{ fontSize: 22, marginBottom: 14 }}>My Active Workshop Listings</h2>
+        <div style={{ background: "#fff", borderRadius: "var(--radius)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
+          <table className="ptable" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <thead>
+              <tr style={{ background: "rgba(250,245,238,0.7)", borderBottom: "1px solid var(--line)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-soft)" }}>
+                <th style={{ padding: "12px 18px" }}>Craft Piece</th>
+                <th style={{ padding: "12px 18px" }}>Discipline</th>
+                <th style={{ padding: "12px 18px" }}>Base Price</th>
+                <th style={{ padding: "12px 18px" }}>Lead Time</th>
+                <th style={{ padding: "12px 18px" }}>Listing State</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myProducts.map((p) => {
+                const isLive = listingsStatus[p.id] !== false;
+                return (
+                  <tr key={p.id} style={{ borderBottom: "1px solid var(--line)", fontSize: 13.5 }}>
+                    <td style={{ padding: "12px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 44, height: 44, background: "#F4E9D8", borderRadius: 10, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <ProductSVG type={p.svg} cfg={{ color: p.colors[0]?.h || "#C05F3C", pattern: "none", text: "" }} />
                       </div>
-                    )}
-                    {r.status === "feasibility_ok" && (
-                      <p className="text-small" style={{ margin: 0 }}>Awaiting customer sign-off on your note.</p>
-                    )}
-                    {r.status === "approved" && (
-                      <p className="text-small row" style={{ gap: 6, margin: 0, color: "var(--ka-success)" }}><IconCheck size={14} /> Approved — add to your production board below.</p>
-                    )}
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* ORDERS */}
-          <section id="orders" aria-labelledby="ord-h">
-            <h2 id="ord-h" style={{ fontSize: "1.2rem" }}>Production board</h2>
-            {orders.length === 0 ? <p className="text-muted text-small">No live orders right now.</p> : (
-              <div className="table-wrap">
-                <table className="table">
-                  <caption className="sr-only">Orders containing your products</caption>
-                  <thead><tr><th>Order</th><th>Customer</th><th>Your items</th><th>Status</th><th>Action</th></tr></thead>
-                  <tbody>
-                    {orders.map((o) => {
-                      const mine = o.lines.filter((l) => PRODUCTS.find((p) => p.id === l.productId)?.artisanId === artisan.id);
-                      return (
-                        <tr key={o.id}>
-                          <td><strong>{o.id}</strong></td>
-                          <td>{o.userEmail.split("@")[0]}</td>
-                          <td>{mine.map((l) => `${PRODUCTS.find((p) => p.id === l.productId)?.name} ×${l.qty}`).join(", ")}</td>
-                          <td><StatusBadge status={o.status} /></td>
-                          <td>
-                            {["placed", "customization_review"].includes(o.status) ? (
-                              <button className="btn btn--secondary btn--sm" onClick={async () => {
-                                await api.advanceOrder(o.id, "Craft started at the bench.");
-                                toast("success", `${o.id} moved to in production.`);
-                                load();
-                              }}>Start production</button>
-                            ) : o.status === "in_production" ? (
-                              <button className="btn btn--outline btn--sm" onClick={async () => {
-                                await api.advanceOrder(o.id, "Packed with authenticity card; handed to courier.");
-                                toast("success", `${o.id} marked shipped.`);
-                                load();
-                              }}>Mark shipped</button>
-                            ) : <span className="text-muted text-small">—</span>}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
-          {/* MY PRODUCTS */}
-          <section id="catalogue" aria-labelledby="cat-h">
-            <h2 id="cat-h" style={{ fontSize: "1.2rem" }}>My catalogue ({myProducts.length})</h2>
-            <div className="table-wrap">
-              <table className="table">
-                <caption className="sr-only">Your listed products</caption>
-                <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Customisable</th><th>Actions</th></tr></thead>
-                <tbody>
-                  {myProducts.map((p) => (
-                    <tr key={p.id}>
-                      <td className="row" style={{ gap: 10 }}>
-                        <img src={p.images[0]} alt="" width={40} height={40} style={{ width: 40, height: 40, borderRadius: 6, objectFit: "cover" }} />
-                        <Link to={`/product/${p.slug}`}>{p.name}</Link>
-                      </td>
-                      <td className="mono-num">{formatINR(p.price)}</td>
-                      <td>{p.stock}</td>
-                      <td>{p.customizable ? <span className="badge badge--indigo">Yes · {p.customization.length} options</span> : <span className="badge badge--neutral">No</span>}</td>
-                      <td><Link className="btn btn--ghost btn--sm" to={`/product/${p.slug}`}><IconEye size={14} /> View listing</Link></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* ADD PRODUCT GUIDANCE */}
-          <section id="uploads" className="card card--pad" aria-labelledby="up-h">
-            <h2 id="up-h" style={{ fontSize: "1.1rem", marginTop: 0 }}>Add a new product</h2>
-            <ol className="stack" style={{ gap: 10, paddingLeft: 20, margin: 0, fontSize: "0.92rem" }}>
-              <li><strong>Photograph on plain cloth</strong> — daylight, no filters. We auto-crop to the square grid customers browse.</li>
-              <li><strong>State materials & dimensions honestly</strong> — listings get approved faster when measurements match the photo scale.</li>
-              <li><strong>Choose which customisations you can truly deliver</strong> — colourways, sizes, initials. You can change these anytime.</li>
-              <li><strong>Set lead time you can keep</strong> — late flags affect featured placement.</li>
-            </ol>
-            <p className="text-small text-muted" style={{ margin: "var(--sp-4) 0 var(--sp-3)" }}>
-              Product creation writes to the platform database in the production build; this demo lists the guided checklist only.
-            </p>
-            <Link to="/help" className="btn btn--outline btn--sm"><IconArrowRight size={14} /> Talk to a craft manager</Link>
-          </section>
+                      <b>{p.name}</b>
+                    </td>
+                    <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{p.cat}</td>
+                    <td style={{ padding: "12px 18px", fontWeight: 600 }}>from ${p.base}</td>
+                    <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{p.lead}</td>
+                    <td style={{ padding: "12px 18px" }}>
+                      <button
+                        className={`toggle ${isLive ? "on" : ""}`}
+                        onClick={() => toggleListing(p.id)}
+                        aria-label="Toggle listing status"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      </div>
+      </section>
 
-      <ConfirmDialog openRef={confirmRef} title="Decline this brief?"
-        body="The customer is refunded fully and told why. Declines are visible to the platform team for quality tracking."
-        confirmLabel="Decline request" danger
-        onConfirm={() => {
-          if (pendingDecline.current) act(pendingDecline.current, { status: "declined", feasibilityNote: "Not feasible with current kiln schedule." }, "Request declined — customer refunded.");
-        }} />
+      {/* SECTION 3: WORKSHOP PRODUCTION ORDERS */}
+      <section style={{ marginTop: 44 }}>
+        <h2 style={{ fontSize: 22, marginBottom: 14 }}>Active Production Orders</h2>
+        <div style={{ background: "#fff", borderRadius: "var(--radius)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
+          <table className="ptable" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <thead>
+              <tr style={{ background: "rgba(250,245,238,0.7)", borderBottom: "1px solid var(--line)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-soft)" }}>
+                <th style={{ padding: "12px 18px" }}>Order ID</th>
+                <th style={{ padding: "12px 18px" }}>Item &amp; Specifications</th>
+                <th style={{ padding: "12px 18px" }}>Patron</th>
+                <th style={{ padding: "12px 18px" }}>Artisan Payout</th>
+                <th style={{ padding: "12px 18px" }}>Production Phase</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeOrders.map((o) => (
+                <tr key={o.id} style={{ borderBottom: "1px solid var(--line)", fontSize: 13.5 }}>
+                  <td style={{ padding: "12px 18px", fontFamily: "monospace", fontWeight: 600 }}>{o.id}</td>
+                  <td style={{ padding: "12px 18px" }}><b>{o.item}</b></td>
+                  <td style={{ padding: "12px 18px", color: "var(--ink-soft)" }}>{o.patron}</td>
+                  <td style={{ padding: "12px 18px", fontWeight: 700, color: "var(--terra)" }}>{o.payout}</td>
+                  <td style={{ padding: "12px 18px" }}>
+                    <span className="status st-wait">{o.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
-}
-
-function Kpi({ icon, num, lbl, tone }: { icon: React.ReactNode; num: string; lbl: string; tone?: "clay" }) {
-  return (
-    <div className="card ka-kpi">
-      <span className="row" style={{ color: tone === "clay" ? "var(--ka-clay)" : "var(--ka-muted)", marginBottom: 6 }}>{icon}</span>
-      <div className="num mono-num">{num}</div>
-      <div className="lbl">{lbl}</div>
-    </div>
-  );
-}
-function SideLink({ href, children, active }: { href: string; children: React.ReactNode; active?: boolean }) {
-  return <a href={href} className={active ? "ka-navlink--active" : ""}>{children}</a>;
 }

@@ -5,6 +5,7 @@ import App from "./App";
 import { AppProvider } from "./context/AppContext";
 import "./tokens.css";
 import "./components.css";
+import "./qwen-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

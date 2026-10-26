@@ -1,183 +1,137 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { api, CATEGORIES } from "../data/store";
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
-import { IconBag, IconHeart, IconMenu, IconClose, IconSearch, IconUser, IconChevronDown } from "./icons";
-
-const NAV = [
-  { to: "/shop", label: "Shop" },
-  { to: "/crafts", label: "Crafts" },
-  { to: "/gallery", label: "GI Library" },
-  { to: "/artisans", label: "Artisans" },
-  { to: "/customize", label: "Customise" },
-  { to: "/about", label: "Our story" },
-];
+import { KalartLogoSVG } from "./CraftSVG";
 
 export default function Header() {
-  const { user, cartCount, favorites, setUser } = useApp();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [craftsOpen, setCraftsOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
-  const craftsRef = useRef<HTMLLIElement>(null);
-  const acctRef = useRef<HTMLDivElement>(null);
-  const nav = useNavigate();
+  const { cartCount, setCartOpen, toast } = useApp();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // close menus on outside click + Escape
-  useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
-      if (craftsRef.current && !craftsRef.current.contains(e.target as Node)) setCraftsOpen(false);
-      if (acctRef.current && !acctRef.current.contains(e.target as Node)) setAccountOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setCraftsOpen(false); setAccountOpen(false); setMobileOpen(false); }
-    };
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
-  }, []);
+  const isCustomer =
+    location.pathname === "/" ||
+    location.pathname.startsWith("/shop") ||
+    location.pathname.startsWith("/product") ||
+    location.pathname.startsWith("/customize") ||
+    location.pathname.startsWith("/artisans") ||
+    location.pathname.startsWith("/crafts") ||
+    location.pathname.startsWith("/gallery");
 
-  const linkCls = ({ isActive }: { isActive: boolean }) =>
-    "ka-navlink" + (isActive ? " ka-navlink--active" : "");
+  const isArtisan = location.pathname.startsWith("/artisan");
+  const isAdmin = location.pathname.startsWith("/admin");
+
+  const handleModeSwitch = (mode: "customer" | "artisan" | "admin") => {
+    if (mode === "customer") {
+      navigate("/");
+    } else if (mode === "artisan") {
+      navigate("/artisan");
+      toast("info", "Artisan Studio — review incoming custom designs");
+    } else if (mode === "admin") {
+      navigate("/admin");
+      toast("info", "Admin console — verification & trust");
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    if (location.pathname !== "/") {
+      navigate("/#" + id);
+    } else {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <header className="ka-header">
-      <div className="ka-announce" role="note">
-        Free shipping over ₹2,000 · Every piece ships with its artisan's story card
+    <header className="ka-site-header" style={{ position: "sticky", top: 0, zIndex: 90, background: "rgba(250,245,238,0.95)", backdropFilter: "blur(14px)", borderBottom: "1px solid var(--line)" }}>
+      {/* ANNOUNCEMENT BANNER */}
+      <div className="ka-announce" role="note" style={{ background: "var(--ink)", color: "var(--cream)", padding: "7px 16px", fontSize: 12.5, textAlign: "center", letterSpacing: "0.03em" }}>
+        🌿 0% Platform Commission · 100% Direct to Makers · Free shipping over ₹2,000 · Every piece ships with signed Certificate of Authenticity
       </div>
-      <div className="container ka-header__inner">
-        <button className="ka-iconbtn ka-mobile-only" aria-label="Open menu" aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((v) => !v)}>
-          {mobileOpen ? <IconClose size={22} /> : <IconMenu size={22} />}
-        </button>
 
-        <Link to="/" className="ka-logo" aria-label="KALART — home">
-          <LogoMark />
-          <span>KALART</span>
+      <div className="hwrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 20 }}>
+        {/* LOGO */}
+        <Link to="/" className="logo" style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 10 }}>
+          <KalartLogoSVG size={36} />
+          <span>
+            <b style={{ fontFamily: "Fraunces, serif", fontSize: 22, letterSpacing: "0.12em", fontWeight: 700, display: "block", color: "var(--ink)" }}>
+              KALART
+            </b>
+            <small style={{ display: "block", fontSize: 9, letterSpacing: "0.26em", color: "var(--ink-soft)", textTransform: "uppercase", marginTop: -2 }}>
+              Handmade · Custom · Verified
+            </small>
+          </span>
         </Link>
 
-        <nav aria-label="Primary" className={"ka-nav" + (mobileOpen ? " ka-nav--open" : "")}>
-          <ul>
-            {NAV.slice(0, 1).map((n) => (
-              <li key={n.to}><NavLink to={n.to} className={linkCls} onClick={() => setMobileOpen(false)}>{n.label}</NavLink></li>
-            ))}
-            <li ref={craftsRef} className="ka-has-menu">
-              <button className="ka-navlink ka-menubtn" aria-expanded={craftsOpen} aria-haspopup="true"
-                onClick={() => setCraftsOpen((v) => !v)}>
-                Crafts <IconChevronDown size={14} />
-              </button>
-              {craftsOpen && (
-                <div className="ka-mega" onMouseLeave={() => setCraftsOpen(false)}>
-                  <ul className="ka-mega__list" role="menu">
-                    {CATEGORIES.map((c) => (
-                      <li key={c.slug} role="none">
-                        <Link role="menuitem" to={`/shop?category=${c.slug}`} onClick={() => { setCraftsOpen(false); setMobileOpen(false); }}>
-                          <img src={c.image} alt="" width={40} height={40} loading="lazy" style={{ width: 40, height: 40, borderRadius: 8, objectFit: "cover" }} />
-                          <span>
-                            <strong>{c.name}</strong>
-                            <small className="text-muted" style={{ display: "block", fontSize: "0.78rem", lineHeight: 1.35 }}>{c.blurb}</small>
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="ka-mega__aside">
-                    <p className="eyebrow" style={{ marginBottom: 6 }}>Not sure where to start?</p>
-                    <p className="text-small text-muted" style={{ margin: "0 0 12px" }}>Browse the bestsellers our customers reorder most.</p>
-                    <Link className="btn btn--outline btn--sm" to="/shop?sort=rating" onClick={() => setCraftsOpen(false)}>Top-rated pieces</Link>
-                  </div>
-                </div>
-              )}
-            </li>
-            {NAV.slice(2).map((n) => (
-              <li key={n.to}><NavLink to={n.to} className={linkCls} onClick={() => setMobileOpen(false)}>{n.label}</NavLink></li>
-            ))}
-          </ul>
+        {/* PRIMARY NAV */}
+        <nav className="mainnav" style={{ display: "flex", gap: 20, marginLeft: 8 }}>
+          <button
+            onClick={() => scrollToSection("discover")}
+            style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 14, fontWeight: 500, cursor: "pointer", padding: "4px 0" }}
+          >
+            Discover
+          </button>
+          <button
+            onClick={() => scrollToSection("artisans")}
+            style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 14, fontWeight: 500, cursor: "pointer", padding: "4px 0" }}
+          >
+            Artisans
+          </button>
+          <button
+            onClick={() => scrollToSection("how")}
+            style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 14, fontWeight: 500, cursor: "pointer", padding: "4px 0" }}
+          >
+            How it works
+          </button>
+          <Link
+            to="/customize"
+            style={{ color: "var(--terra)", textDecoration: "none", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}
+          >
+            <span>✨</span> Customizer
+          </Link>
         </nav>
 
-        <div className="ka-actions">
-          <form role="search" action="/shop" method="get" className="ka-search" onSubmit={(e) => {
-            const q = (new FormData(e.currentTarget).get("q") as string | null)?.trim();
-            e.preventDefault();
-            nav(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
-            setMobileOpen(false);
-          }}>
-            <IconSearch size={18} />
-            <input type="search" name="q" placeholder="Search shawls, jutti, ikat…" aria-label="Search products" />
-          </form>
+        <div style={{ flex: 1 }} />
 
-          <Link to="/favorites" className="ka-iconbtn" aria-label={`Favourites (${favorites.length})`}>
-            <IconHeart size={20} />
-            {favorites.length > 0 && <span className="ka-count">{favorites.length}</span>}
-          </Link>
-
-          <Link to="/cart" className="ka-iconbtn" aria-label={`Cart (${cartCount} items)`}>
-            <IconBag size={20} />
-            {cartCount > 0 && <span className="ka-count ka-count--clay">{cartCount}</span>}
-          </Link>
-
-          <div ref={acctRef} className="ka-has-menu ka-acct">
-            <button className="ka-iconbtn" aria-expanded={accountOpen} aria-haspopup="true"
-              aria-label={user ? `Account menu for ${user.name}` : "Sign in"}
-              onClick={() => setAccountOpen((v) => !v)}>
-              <IconUser size={20} />
-            </button>
-            {accountOpen && (
-              <div className="ka-dropdown">
-                {user ? (
-                  <>
-                    <p className="text-small" style={{ margin: "4px 14px 8px" }}>
-                      Signed in as <strong>{user.name}</strong><br />
-                      <span className="badge badge--neutral" style={{ marginTop: 4 }}>{roleLabel(user.role)}</span>
-                    </p>
-                    <hr className="divider" style={{ margin: "6px 0" }} />
-                    {(user.role === "customer" || !user.role) && <Link to="/account/orders" onClick={() => setAccountOpen(false)}>My orders</Link>}
-                    {user.role === "artisan" && <Link to="/artisan" onClick={() => setAccountOpen(false)}>Artisan workspace</Link>}
-                    {user.role === "admin" && <Link to="/admin" onClick={() => setAccountOpen(false)}>Admin console</Link>}
-                    <Link to="/favorites" onClick={() => setAccountOpen(false)}>Favourites</Link>
-                    <button className="ka-dd-btn" onClick={() => { api.logout(); setUser(null); setAccountOpen(false); nav("/"); }}>Sign out</button>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/login" onClick={() => setAccountOpen(false)}>Sign in</Link>
-                    <Link to="/signup" onClick={() => setAccountOpen(false)}>Create account</Link>
-                    <hr className="divider" style={{ margin: "6px 0" }} />
-                    <Link to="/sell" onClick={() => setAccountOpen(false)}>Sell your craft</Link>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+        {/* TRI-ROLE SWITCHER */}
+        <div className="seg" role="tablist" aria-label="Role Switcher">
+          <button
+            className={isCustomer ? "active" : ""}
+            onClick={() => handleModeSwitch("customer")}
+            aria-selected={isCustomer}
+          >
+            🛍 Customer
+          </button>
+          <button
+            className={isArtisan ? "active" : ""}
+            onClick={() => handleModeSwitch("artisan")}
+            aria-selected={isArtisan}
+          >
+            🧵 Artisan
+          </button>
+          <button
+            className={isAdmin ? "active" : ""}
+            onClick={() => handleModeSwitch("admin")}
+            aria-selected={isAdmin}
+          >
+            🛡 Admin
+          </button>
         </div>
+
+        {/* BASKET DRAWER TRIGGER */}
+        <button
+          className="cartbtn"
+          onClick={() => setCartOpen(true)}
+          aria-label={`Shopping cart with ${cartCount} items`}
+        >
+          <svg fill="none" strokeWidth="1.8" viewBox="0 0 24 24" width="20" height="20" stroke="var(--ink)">
+            <path d="M6 7h12l-1.2 12.2a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 7z" />
+            <path d="M9 10V6a3 3 0 016 0v4" />
+          </svg>
+          <span className={`cartcount ${cartCount > 0 ? "show" : ""}`}>
+            {cartCount}
+          </span>
+        </button>
       </div>
-
-      {/* mobile search sits below when menu open */}
-      {mobileOpen && (
-        <div className="container ka-mobile-search">
-          <form role="search" action="/shop" method="get" className="ka-search ka-search--full" onSubmit={(e) => {
-            const q = (new FormData(e.currentTarget).get("q") as string | null)?.trim();
-            e.preventDefault();
-            nav(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
-            setMobileOpen(false);
-          }}>
-            <IconSearch size={18} />
-            <input type="search" name="q" placeholder="Search handmade crafts…" aria-label="Search products" />
-          </form>
-        </div>
-      )}
     </header>
-  );
-}
-
-function roleLabel(r: string) {
-  return r === "admin" ? "Administrator" : r === "artisan" ? "Artisan partner" : "Customer";
-}
-
-function LogoMark() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden focusable="false">
-      <rect x="1" y="1" width="30" height="30" rx="8" fill="#2b2620" />
-      <path d="M8 24V8m0 8 8-8m-8 8 8 8" stroke="#f3ecdf" strokeWidth="2.6" strokeLinecap="round" fill="none" />
-      <circle cx="23" cy="10.5" r="2.6" fill="#a8503a" />
-    </svg>
   );
 }
